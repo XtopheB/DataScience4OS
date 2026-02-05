@@ -30,6 +30,13 @@ set.seed(123)
 Descriptive statistics are essential in official statistics.  
 However, they are often insufficient to understand **relationships** between variables.
 
+They are essential, but:
+  - They hide heterogeneity
+  - They cannot isolate multiple effects
+  - They may lead to misleading policy conclusions
+
+We illustrate this Here
+
 ---
 
 ## A simple official statistics question
@@ -44,210 +51,12 @@ How does household income vary with years of education?
 
 ---
 
-## Simulated NSO-like dataset
 
-```{r}
-n <- 200
-
-data <- tibble(
-  education = round(runif(n, 2, 16)),
-  age = round(runif(n, 25, 60)),
-  income = 500 +
-           120 * education +
-           20 * age +
-           rnorm(n, 0, 400)
-)
-```
-
----
-
-## STEP 1 — Descriptive statistics (grouped averages)
-
-```{r}
-data %>%
-  mutate(edu_group = cut(
-    education,
-    breaks = c(0, 6, 12, 20),
-    labels = c("Low", "Medium", "High")
-  )) %>%
-  group_by(edu_group) %>%
-  summarise(
-    avg_income = mean(income),
-    .groups = "drop"
-  )
-```
-
-Grouped averages are simple — but they hide variability.
-
----
-
-## STEP 2 — Bar plot of grouped averages
-
-```{r, fig.height=4}
-data %>%
-  mutate(edu_group = cut(
-    education,
-    breaks = c(0, 6, 12, 20),
-    labels = c("Low", "Medium", "High")
-  )) %>%
-  group_by(edu_group) %>%
-  summarise(avg_income = mean(income)) %>%
-  ggplot(aes(edu_group, avg_income)) +
-  geom_col() +
-  labs(
-    x = "Education level",
-    y = "Average household income"
-  )
-```
-
----
-
-## STEP 3 — Scatterplot: raw data
-
-```{r, fig.height=4}
-ggplot(data, aes(education, income)) +
-  geom_point(alpha = 0.6) +
-  labs(
-    x = "Years of education",
-    y = "Household income"
-  )
-```
-
-Individuals with the same education can have very different incomes.
-
----
-
-## STEP 4 — A naïve regression line
-
-```{r, fig.height=4}
-ggplot(data, aes(education, income)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(
-    x = "Years of education",
-    y = "Household income"
-  )
-```
-
----
-
-## STEP 5 — Introducing a hidden factor: age
----
-
-## STEP 5 — Introducing a hidden factor: age
-
-```{r}
-data <- data %>%
-  mutate(
-    age_group = if_else(age < 40, "Younger", "Older"),
-    edu_group = cut(
-      education,
-      breaks = c(0, 6, 12, 20),
-      labels = c("Low", "Medium", "High")
-    )
-  )
-```
-
----
-
-## STEP 6 — Dodged bar chart: education, age and income
-
-```{r, fig.height=4}
-data %>%
-  group_by(edu_group, age_group) %>%
-  summarise(
-    avg_income = mean(income),
-    .groups = "drop"
-  ) %>%
-  ggplot(aes(edu_group, avg_income, fill = age_group)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Education level",
-    y = "Average household income",
-    fill = "Age group"
-  )
-```
-
-Same education level, different income depending on age.
-
----
-
-
-
-
-```{r, fig.height=4}
-ggplot(data, aes(education, income, color = age_group)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(
-    x = "Years of education",
-    y = "Household income",
-    color = "Age group"
-  )
-```
-
----
-
-## STEP 7 — Regression model (conceptual entry)
-
-```{r}
-model <- lm(income ~ education + age, data = data)
-summary(model)
-```
-
-Regression estimates the effect of education **holding age constant**.
-
----
-
-## STEP 8 — Predicted relationships (clean interpretation)
-
-```{r, fig.height=4}
-newdata <- expand.grid(
-  education = seq(2, 16, 1),
-  age = c(30, 50)
-)
-
-newdata$predicted_income <- predict(model, newdata)
-
-ggplot(newdata, aes(education, predicted_income, color = factor(age))) +
-  geom_line(linewidth = 1.2) +
-  labs(
-    x = "Years of education",
-    y = "Predicted household income",
-    color = "Age"
-  )
-```
-
----
-
-## Take-away messages
-
-- Descriptive statistics are necessary but not sufficient
-- Averages can hide variability and confounding
-- Regression formalizes “all else being equal”
-- This logic is central to official statistics
-
-
--------
-
-
-# NEW Motivation
-
-## Why this example?
-
-- Descriptive statistics are widely used in National Statistical Offices
-- They are essential, but:
-  - They hide heterogeneity
-  - They cannot isolate multiple effects
-  - They may lead to misleading policy conclusions
-
-We illustrate this using income, education, sex, and age.
-
-# Simulated data
+# Data
 
 ## Data-generating process (unknown to the analyst)
 
-```{r}
+```{r include=FALSE}
 n <- 600
 
 data <- tibble(
@@ -259,16 +68,17 @@ data <- tibble(
   )
 ) %>%
   mutate(
-    years_education = case_when(
+    education = case_when(
       education_level == "None" ~ round(rnorm(n(), 5, 1)),
       education_level == "Secondary" ~ round(rnorm(n(), 10, 1)),
       education_level == "Tertiary" ~ round(rnorm(n(), 16, 1))
     ),
     age = round(rnorm(n(), mean = 40, sd = 10)),
+    
     base_income = 300,
-    education_effect = 20 * years_education,
+    education_effect = 20 * education,
     sex_education_bonus = if_else(
-      sex == "Women" & years_education > 14,
+      sex == "Women" & education > 14,
       150,
       0
     ),
@@ -277,6 +87,14 @@ data <- tibble(
       sex_education_bonus +
       rnorm(n(), 0, 60)
   )
+
+# Data Simulation cleaning
+
+
+data1 <- data %>%
+  select(income, age,  education, education_level, sex) 
+
+
 ```
 
 # Descriptive statistics
@@ -306,7 +124,7 @@ data %>%
 ## Scatter plot: income vs years of education
 
 ```{r}
-ggplot(data, aes(years_education, income)) +
+ggplot(data, aes(education, income)) +
   geom_point(alpha = 0.5) +
   labs(
     title = "Income and years of education",
@@ -323,7 +141,7 @@ This suggests a positive relationship, but variability is large.
 ## Income, education and age
 
 ```{r}
-ggplot(data, aes(years_education, income, color = age)) +
+ggplot(data, aes(education, income, color = age)) +
   geom_point(alpha = 0.6) +
   labs(
     title = "Income, education and age",
@@ -341,7 +159,7 @@ The relationship is still hard to interpret clearly.
 ## Income–education relationship by sex
 
 ```{r}
-ggplot(data, aes(years_education, income, color = sex)) +
+ggplot(data, aes(education, income, color = sex)) +
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
@@ -374,7 +192,7 @@ This motivates regression.
 ## Linear model with interaction
 
 ```{r, echo=TRUE}
-model <- lm(income ~ years_education * sex + age, data = data)
+model <- lm(income ~ education * sex + age, data = data)
 summary(model)
 ```
 
