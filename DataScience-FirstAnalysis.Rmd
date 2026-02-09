@@ -456,13 +456,16 @@ data <- data %>%
          abs_residual = abs(residual)
   )
                              
-# Select 5-10 random points to show residuals
-# Get extreme points both above and below the line
+# Select 8 random points to show residuals
+
+# Divide education into bins and pick one extreme point from each bin
 sample_points <- data %>%
-  slice_max(residual, n = 2) %>%      # 4 highest (above line)
-  bind_rows(
-    data %>% slice_min(residual, n = 6)  # 4 lowest (below line)
-  )
+  mutate(edu_bin = cut(education, breaks = 9)) %>%  # Create 8 bins
+  group_by(edu_bin) %>%
+    sample_n(1) %>% # One residual in each bin
+  ungroup() %>%
+  select(-edu_bin)
+
 ```
 
 
@@ -476,7 +479,7 @@ ggplot(data, aes(education, income)) +
   geom_point(data = sample_points,
              aes(education, income),
              color = "red", 
-             size = 1.5,
+             size = 2,
              alpha = 0.8) +
   labs(
     title = "Income and years of education",
@@ -503,7 +506,7 @@ ggplot(data, aes(education, income)) +
   geom_point(data = sample_points,
              aes(education, income),
              color = "red", 
-             size = 0.5,
+             size = 1.5,
              alpha = 0.8) +
   labs(
     title = "Income and years of education",
