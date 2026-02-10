@@ -110,7 +110,7 @@ We illustrate this here in this reproducible example.
 ## A simple question
 
 **Question:**  
-> How does household income vary with years of education?
+> How does household income vary with education?
 
 ---
 
@@ -120,7 +120,7 @@ We illustrate this here in this reproducible example.
 **Variables:**
 
 - **income**:  Household income (continuous)
-- **education**: Years of education of household head (continuous)
+- **education**: Adjusted years of education of household head (continuous)
 - **age**: Age of household head (continuous)
 - **sex**: Sex of household head ("Man" or "Woman)
 - **education_level**: Level of education (3 levels)
@@ -135,7 +135,8 @@ n <- 600
 data <- tibble(
   sex = sample(c("Men", "Women"), n, replace = TRUE),
   age = round(rnorm(n, mean = 40, sd = 10)),
-  education = round(rnorm(n, mean = 10, sd = 4))
+  #education = round(rnorm(n, mean = 10, sd = 4))
+  education = rnorm(n, mean = 10, sd = 4)
 ) %>%
   mutate(
     # Constrain education to realistic range (0-20 years)
@@ -244,14 +245,14 @@ data %>%
 
 # Adding a continuous variable
 
-## Scatter plot: income vs years of education
+## Scatter plot: income vs education
 
 ```{r basic-scatterplot}
 ggplot(data, aes(education, income)) +
   geom_point(color = SIAP.color, alpha = 0.5) +
   labs(
-    title = "Income and years of education",
-    x = "Years of education",
+    title = "Income and education",
+    x = "Education (Adjusted years)",
     y = "Income"
   ) 
 ```
@@ -288,7 +289,7 @@ ggplot(data, aes(education, income, color = age_group)) +
   labs(
     title = "Income and education",
     subtitle = "Color is age group",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income",
     color = "Age"
   ) +
@@ -368,9 +369,9 @@ ggplot(data, aes(education, income)) +
   geom_point(alpha = 0.4, color = SIAP.color) +
   geom_smooth(method = "lm", se = FALSE, color = "grey") +
   labs(
-    title = "Income and years of education",
+    title = "Income and education",
     subtitle = "Regression line adjusted for age and sex",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income"
   ) 
 ```
@@ -395,9 +396,9 @@ ggplot(data, aes(education, income, color = sex)) +
     linewidth = 1 ) +
   scale_color_manual(values = sex_colors)+
   labs(
-    title = "Income and years of education by sex",
+    title = "Income and education by sex",
     subtitle = "Same regression model, adjusted for age",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income",
     color = "Sex" ) +
   theme_minimal()
@@ -429,7 +430,7 @@ ggplot(data, aes(education, income, color = sex)) +
   scale_color_manual(values = sex_colors)+
   labs(
     title = "Income–education relationship by sex",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income",
     color = "Sex"
   ) 
@@ -482,9 +483,9 @@ ggplot(data, aes(education, income)) +
              size = 2,
              alpha = 0.8) +
   labs(
-    title = "Income and years of education",
+    title = "Income and education",
     subtitle = "Highlighting points (in red) far from the regression line)",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income"
   )
 ```
@@ -509,9 +510,9 @@ ggplot(data, aes(education, income)) +
              size = 1.5,
              alpha = 0.8) +
   labs(
-    title = "Income and years of education",
+    title = "Income and education",
     subtitle = "Red lines show residuals (observed - predicted)",
-    x = "Years of education",
+    x = "Education (Adjusted years)",
     y = "Income"
   )
 ```
