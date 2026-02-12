@@ -251,7 +251,7 @@ data %>%
 ggplot(data, aes(education, income)) +
   geom_point(color = SIAP.color, alpha = 0.5) +
   labs(
-    title = "Income and education",
+    title = "Scatter plot of Income vs education",
     x = "Education (Adjusted years)",
     y = "Income"
   ) 
@@ -295,10 +295,11 @@ ggplot(data, aes(education, income, color = age_group)) +
   ) +
   theme(
     panel.border = element_rect(color = "grey70", fill = NA, linewidth = 0.5),
-  # axis.line.y = element_line(color = "black"),
-  # axis.ticks.y = element_line(color = "black"),
-  panel.spacing.x = unit(2, "lines"),  # Horizontal spacing
-  panel.spacing.y = unit(1, "lines")   # Vertical spacing (if wrapped)
+    # axis.line.y = element_line(color = "black"),
+    # axis.ticks.y = element_line(color = "black"),
+    panel.spacing.x = unit(2, "lines"),  # Horizontal spacing
+    panel.spacing.y = unit(1, "lines"),   # Vertical spacing (if wrapped)
+    legend.position = "bottom"
 )
 ```
 
@@ -309,6 +310,8 @@ ggplot(data, aes(education, income, color = age_group)) +
 GGally::ggpairs(data, 
         columns = c("income", "age", "education"),
         aes(color = sex, alpha = 0.3),
+        title = "Distribution and relationships between Income, Age, and Education \n (by sex)",
+        switch = "both",   # labels bottom and left
         upper = list(continuous = "cor"),      # Correlations in upper triangle
         lower = list(continuous = "points"),   # Scatterplots in lower triangle
         diag = list(continuous = "densityDiag")) + # Density plots on diagonal
@@ -330,6 +333,26 @@ This motivates regression.
 
 # Regression model
 
+## Asimple  Linear model
+
+Let's just assess the relation between $y$= income and  $X$ = Education
+
+```{r, echo=TRUE}
+modelUni <- lm(income ~ education, data = data)
+summary(modelUni)
+```
+
+
+```{r}
+modelsummary(
+  modelUni,
+  statistic = "std.error",
+  stars = TRUE,
+  output = "html"
+)
+```
+
+
 ## Linear model with all variables
 
 ```{r, echo=TRUE}
@@ -340,7 +363,7 @@ summary(model)
 
 ```{r}
 modelsummary(
-  model,
+  modelUni,
   statistic = "std.error",
   stars = TRUE,
   output = "html"
