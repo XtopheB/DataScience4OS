@@ -2,6 +2,7 @@
 *.html
 *.pdf
 *.docx
+*.tex
 # History files
 .Rhistory
 .Rapp.history
@@ -39,3 +40,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 tinytable_assets
+DataScience-FirstAnalysis_files
