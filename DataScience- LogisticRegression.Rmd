@@ -1,0 +1,427 @@
+
+---
+title: "A step-by-step Analysis- Descriptive"
+subtitle: "NSB course - Thimphu"
+author: "Christophe Bontemps"
+date:   "`r Sys.Date()`"
+output:
+  html_document: 
+    df_print: paged
+    always_allow_html: true
+    toc: yes
+    toc_float: true
+    keep_md: no
+    code_folding: show
+    code_download: true
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+# My default setting for this document
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE,
+  comment = NA
+)
+```
+
+
+```{r libraries, include=FALSE}
+# Tidy data management packages
+library(tidyverse)
+library(data.table)
+library(haven)
+
+# Plotting packages
+library(ggplot2)
+library(RColorBrewer)
+library(GGally)
+
+# Nice presentation of results
+library(knitr)
+# library(papeR)
+
+# Tables 
+library(modelsummary)
+library(sjPlot) # for regression
+library(gt) 
+library(gtsummary)
+library(survey)
+library(labelled)
+```
+
+
+```{r setup_graphics, include=FALSE}
+# Setting the theme for graphics
+theme_set(theme_minimal() + theme(panel.grid = element_blank()))
+```
+
+
+```{r seed, include=FALSE}
+# We'll see why this is important later
+set.seed(2512) # For reproducibility
+```
+
+```{r load-libraries}
+library(tidyverse)
+
+```
+
+
+######################
+
+
+# Data Import and Preparation
+
+## Reading Data
+
+```{r import-data}
+# Import CSV data
+data_raw <- read_csv("Data/wmmics.csv")
+
+# Select only variables needed (uppercase)
+wmfinal <- data_raw %>%
+  select(HH1, HH2, LN, HH6, WB4, WB6A, MA1, 
+         DV1A, DV1B, DV1C, DV1D, DV1E, 
+        windex5,wmweight,PSU,stratum,
+         CEB, CDEAD, CSURV, WM17)
+```
+
+## Variable Generation
+
+```{r generate-variables}
+# Generate analysis variables
+wmfinal <- wmfinal %>%
+  mutate(
+    # Urban/Rural
+    UBN = case_when(
+      HH6 == "Urban" ~ 1,
+      HH6 == "Rural" ~ 0,
+      TRUE ~ NA_real_
+    ),
+    
+    # Marital Status
+    MA = case_when(
+      MA1 == "NO, NOT IN UNION" ~ 0,
+      MA1 == "YES, CURRENTLY MARRIED" ~ 1,
+      MA1 == "YES, LIVING WITH A PARTNER" ~ 1,
+      TRUE ~ NA_real_
+    ),
+    
+    # Domestic Violence
+    dv = case_when(
+      DV1A == "NO" & DV1B == "NO" & DV1C == "NO" & 
+      DV1D == "NO" & DV1E == "NO" ~ 0,
+      TRUE ~ 1
+    ),
+    
+    # Education Level
+    EDU = case_when(
+      WB6A == "EARLY CHILDHOOD EDUCATION" ~ 2,
+      WB6A == "SECONDARY SCHOOL" ~ 2,
+      WB6A == "VOCATIONAL TRAINING CENTER (TECHNICUM)" ~ 3,
+      WB6A == "UNIVERSITY, INSTITUTE/COLLEGE" ~ 4,
+      TRUE ~ NA_real_
+    ),
+    
+    # Wealth Index
+    windex = case_when(
+      windex5 %in% c("0", "Poorest") ~ 1,
+      windex5 == "Second" ~ 2,
+      windex5 == "Middle" ~ 3,
+      windex5 == "Fourth" ~ 4,
+      windex5 == "Richest" ~ 5,
+      TRUE ~ NA_real_
+    ),
+    
+    # Numeric conversions
+    age = as.numeric(WB4),
+    ceb1 = as.numeric(CEB),
+    cdead1 = as.numeric(CDEAD),
+    csurv1 = as.numeric(CSURV)
+  ) %>%
+  
+  # Convert categorical variables to factors
+  mutate(
+    UBN = factor(UBN, levels = 0:1, labels = c("Rural", "Urban")),
+    MA = factor(MA, levels = 0:1, labels = c("Not in Union", "Married/Partnered")),
+    dv = factor(dv, levels = 0:1, labels = c("No", "Yes")),
+    EDU = factor(EDU, levels = 2:4, 
+                 labels = c("Primary/Secondary", "Vocational", "University")),
+    windex = factor(windex, levels = 1:5,
+                    labels = c("Poorest", "Second", "Middle", "Fourth", "Richest"))
+  )
+```
+
+## Data Summary
+
+```{r data-summary}
+# Display summary statistics
+wmfinal %>%
+  select(age, UBN, MA, dv, EDU, windex ) %>%
+  summary()
+```
+
+# Exploratory Analysis
+
+## Correlations
+
+```{r correlations}
+# Spearman correlations
+cor_ceb_csurv <- cor.test(wmfinal$ceb1, wmfinal$csurv1, 
+                          method = "spearman", use = "complete.obs")
+cor_ceb_cdead <- cor.test(wmfinal$ceb1, wmfinal$cdead1, 
+                          method = "spearman", use = "complete.obs")
+
+cat("Correlation between children ever born and children surviving:\n")
+cat("rho =", round(cor_ceb_csurv$estimate, 3), 
+    ", p-value =", format.pval(cor_ceb_csurv$p.value), "\n\n")
+
+cat("Correlation between children ever born and children dead:\n")
+cat("rho =", round(cor_ceb_cdead$estimate, 3), 
+    ", p-value =", format.pval(cor_ceb_cdead$p.value), "\n")
+```
+
+## Setting Survey Design
+
+```{r survey-design}
+# Remove missing values
+wmfinal_clean <- wmfinal %>%
+  filter(!is.na(windex), !is.na(EDU), !is.na(MA), 
+         !is.na(UBN), !is.na(age), !is.na(dv))
+
+# Set survey design
+design <- svydesign(
+  ids = ~PSU,
+  weights = ~wmweight,
+  strata = ~stratum,
+  data = wmfinal_clean,
+  nest = TRUE
+)
+```
+
+# Cross-Tabulations
+
+## Domestic Violence by Education
+
+```{r tab-edu}
+svytable(~dv + EDU, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = EDU, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Domestic Violence by Education Level",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -dv, decimals = 1)
+```
+
+## Domestic Violence by Wealth Index
+
+```{r tab-wealth}
+svytable(~dv + windex, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = windex, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Domestic Violence by Wealth Index",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -dv, decimals = 1)
+```
+
+## Domestic Violence by Urban/Rural
+
+```{r tab-urban}
+svytable(~dv + UBN, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = UBN, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Domestic Violence by Residence",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -dv, decimals = 1)
+```
+
+## Domestic Violence by Marital Status
+
+```{r tab-marital}
+svytable(~dv + MA, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = MA, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Domestic Violence by Marital Status",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -dv, decimals = 1)
+```
+
+## Additional Cross-Tabulations
+
+### Urban/Rural by Wealth Index
+
+```{r tab-urban-wealth}
+svytable(~UBN + windex, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = windex, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Residence by Wealth Index",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -UBN, decimals = 1)
+```
+
+### Wealth Index by Education
+
+```{r tab-wealth-edu}
+svytable(~windex + EDU, design) %>%
+  prop.table(margin = 2) %>%
+  round(3) %>%
+  as.data.frame() %>%
+  pivot_wider(names_from = EDU, values_from = Freq) %>%
+  gt() %>%
+  tab_header(title = "Wealth Index by Education Level",
+             subtitle = "Column percentages") %>%
+  fmt_percent(columns = -windex, decimals = 1)
+```
+
+# Logistic Regression Analysis
+
+## Model 1: Full Model with Urban/Rural
+
+```{r model1}
+model1 <- svyglm(dv ~ UBN + age + EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+summary(model1)
+
+# Display with gtsummary
+tbl_regression(model1, exponentiate = FALSE) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels()
+```
+
+## Model 2: Without Urban/Rural
+
+```{r model2}
+model2 <- svyglm(dv ~ EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+summary(model2)
+
+# Display with gtsummary
+tbl_regression(model2, exponentiate = FALSE) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels()
+```
+
+## Model 3: With Odds Ratios
+
+```{r model3}
+model3 <- svyglm(dv ~ EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+# Display with odds ratios
+tbl_regression(model3, exponentiate = TRUE) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels() %>%
+  modify_header(estimate ~ "**OR**") %>%
+  modify_footnote(estimate ~ "OR = Odds Ratio")
+```
+
+## Model Comparison
+
+```{r model-comparison}
+tbl_merge(
+  list(
+    tbl_regression(model1, exponentiate = TRUE, label = list(
+      UBN ~ "Residence",
+      age ~ "Age",
+      EDU ~ "Education",
+      windex ~ "Wealth Index",
+      MA ~ "Marital Status"
+    )),
+    tbl_regression(model2, exponentiate = TRUE, label = list(
+      EDU ~ "Education",
+      windex ~ "Wealth Index",
+      MA ~ "Marital Status"
+    ))
+  ),
+  tab_spanner = c("**Model 1: Full**", "**Model 2: Reduced**")
+) %>%
+  bold_p()
+```
+
+# Visualizations
+
+## Domestic Violence Prevalence by Key Variables
+
+```{r viz-prevalence}
+# Calculate weighted proportions
+prev_data <- wmfinal_clean %>%
+  pivot_longer(cols = c(UBN, EDU, windex, MA), 
+               names_to = "variable", 
+               values_to = "category") %>%
+  group_by(variable, category, dv) %>%
+  summarise(n = sum(wmweight), .groups = "drop") %>%
+  group_by(variable, category) %>%
+  mutate(prop = n / sum(n)) %>%
+  filter(dv == "Yes")
+
+ggplot(prev_data, aes(x = category, y = prop, fill = variable)) +
+  geom_col() +
+  facet_wrap(~variable, scales = "free_x") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "Domestic Violence Prevalence by Sociodemographic Characteristics",
+    x = NULL,
+    y = "Prevalence (%)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+```
+
+## Age Distribution by DV Status
+
+```{r viz-age}
+ggplot(wmfinal_clean, aes(x = age, fill = dv)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("No" = "#3498DB", "Yes" = "#E74C3C")) +
+  labs(
+    title = "Age Distribution by Domestic Violence Status",
+    x = "Age",
+    y = "Density",
+    fill = "Experienced DV"
+  ) +
+  theme_minimal()
+```
+
+# Conclusions
+
+This analysis examined factors associated with domestic violence among women in the MICS survey. Key findings include:
+
+1. **Education**: Higher education levels show [describe pattern]
+2. **Wealth**: Wealth index shows [describe pattern]
+3. **Residence**: Urban/rural differences [describe pattern]
+4. **Marital Status**: [Describe pattern]
+
+The logistic regression models indicate that [summarize key predictors].
+
+---
+
+**Note**: Replace file paths and add interpretations as needed for your specific analysis.
