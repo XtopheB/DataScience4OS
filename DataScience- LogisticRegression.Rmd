@@ -1,4 +1,3 @@
-
 ---
 title: "A step-by-step Analysis- Descriptive"
 subtitle: "NSB course - Thimphu"
@@ -51,6 +50,7 @@ library(gt)
 library(gtsummary)
 library(survey)
 library(labelled)
+library(broom.helpers)
 ```
 
 
@@ -291,80 +291,8 @@ svytable(~windex + EDU, design) %>%
   fmt_percent(columns = -windex, decimals = 1)
 ```
 
-# Logistic Regression Analysis
+# Visualizing
 
-## Model 1: Full Model with Urban/Rural
-
-```{r model1}
-model1 <- svyglm(dv ~ UBN + age + EDU + windex + MA, 
-                 design = design, 
-                 family = quasibinomial())
-
-summary(model1)
-
-# Display with gtsummary
-tbl_regression(model1, exponentiate = FALSE) %>%
-  add_glance_table() %>%
-  bold_p() %>%
-  bold_labels()
-```
-
-## Model 2: Without Urban/Rural
-
-```{r model2}
-model2 <- svyglm(dv ~ EDU + windex + MA, 
-                 design = design, 
-                 family = quasibinomial())
-
-summary(model2)
-
-# Display with gtsummary
-tbl_regression(model2, exponentiate = FALSE) %>%
-  add_glance_table() %>%
-  bold_p() %>%
-  bold_labels()
-```
-
-## Model 3: With Odds Ratios
-
-```{r model3}
-model3 <- svyglm(dv ~ EDU + windex + MA, 
-                 design = design, 
-                 family = quasibinomial())
-
-# Display with odds ratios
-tbl_regression(model3, exponentiate = TRUE) %>%
-  add_glance_table() %>%
-  bold_p() %>%
-  bold_labels() %>%
-  modify_header(estimate ~ "**OR**") %>%
-  modify_footnote(estimate ~ "OR = Odds Ratio")
-```
-
-## Model Comparison
-
-```{r model-comparison}
-tbl_merge(
-  list(
-    tbl_regression(model1, exponentiate = TRUE, label = list(
-      UBN ~ "Residence",
-      age ~ "Age",
-      EDU ~ "Education",
-      windex ~ "Wealth Index",
-      MA ~ "Marital Status"
-    )),
-    tbl_regression(model2, exponentiate = TRUE, label = list(
-      EDU ~ "Education",
-      windex ~ "Wealth Index",
-      MA ~ "Marital Status"
-    ))
-  ),
-  tab_spanner = c("**Model 1: Full**", "**Model 2: Reduced**")
-) %>%
-  bold_p()
-```
-
-# Visualizations
 
 ## Domestic Violence Prevalence by Key Variables
 
@@ -411,17 +339,121 @@ ggplot(wmfinal_clean, aes(x = age, fill = dv)) +
   theme_minimal()
 ```
 
+
+# Logistic Regression Analysis
+
+## Model 1: Full Model with Urban/Rural
+
+```{r model1}
+model1 <- svyglm(dv ~ UBN + age + EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+summary(model1)
+```
+
+
+
+
+```{r eval=FALSE, include=FALSE}
+library(stargazer)
+## Just for output in slides
+
+stargazer(model1, 
+          type = "latex",  # vs "html"
+          title = "Logistic Regression Results",
+          dep.var.labels = "Domestic Violence",
+          covariate.labels = c("Urban", "Age", "Vocational", "University",
+                               "Second Quintile", "Middle Quintile", 
+                               "Fourth Quintile", "Richest Quintile",
+                               "Married/Partnered"),
+          apply.coef = exp,  # Convert to odds ratios
+          single.row = TRUE,
+          ci = TRUE,
+          ci.level = 0.95)
+```
+
+```{r table-model1}
+# Display with gtsummary
+tbl_regression(model1,
+               estimate_fun = label_style_number(digits = 3)) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels()
+  
+```
+
+## Model 2: Without Urban/Rural
+
+```{r model2}
+model2 <- svyglm(dv ~ EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+summary(model2)
+```
+
+
+```{r table-model2}
+# Display with gtsummary
+tbl_regression(model2,,
+               estimate_fun = label_style_number(digits = 3)) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels()
+```
+
+## Model 3: With Odds Ratios
+
+```{r model3}
+model3 <- svyglm(dv ~ EDU + windex + MA, 
+                 design = design, 
+                 family = quasibinomial())
+
+# Display with odds ratios
+tbl_regression(model3,
+               estimate_fun = label_style_number(digits = 3),
+               exponentiate = TRUE) %>%
+  add_glance_table() %>%
+  bold_p() %>%
+  bold_labels() %>%
+  modify_header(estimate ~ "**OR**") %>%
+  modify_footnote(estimate ~ "OR = Odds Ratio")
+```
+
+## Model Comparison
+
+```{r model-comparison}
+tbl_merge(
+  list(
+    tbl_regression(model1, exponentiate = TRUE, label = list(
+      UBN ~ "Residence",
+      age ~ "Age",
+      EDU ~ "Education",
+      windex ~ "Wealth Index",
+      MA ~ "Marital Status"
+    )),
+    tbl_regression(model2, exponentiate = TRUE, label = list(
+      EDU ~ "Education",
+      windex ~ "Wealth Index",
+      MA ~ "Marital Status"
+    ))
+  ),
+  tab_spanner = c("**Model 1: Full**", "**Model 2: Reduced**")
+) 
+```
+
+# Visualizations
+
 # Conclusions
 
 This analysis examined factors associated with domestic violence among women in the MICS survey. Key findings include:
 
-1. **Education**: Higher education levels show [describe pattern]
-2. **Wealth**: Wealth index shows [describe pattern]
-3. **Residence**: Urban/rural differences [describe pattern]
-4. **Marital Status**: [Describe pattern]
+1. **Education**: Higher education levels show 
+2. **Wealth**: Wealth index shows 
+3. **Residence**: Urban/rural differences
+4. **Marital Status**: 
 
-The logistic regression models indicate that [summarize key predictors].
+The logistic regression models indicate that 
 
 ---
-
-**Note**: Replace file paths and add interpretations as needed for your specific analysis.
