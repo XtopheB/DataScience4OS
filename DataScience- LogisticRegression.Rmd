@@ -4,8 +4,6 @@ subtitle: "NSB course - Thimphu"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
-  word_document: default
-  pdf_document: default
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -14,6 +12,8 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -50,6 +50,8 @@ library(gt)
 library(gtsummary)
 library(survey)
 library(labelled)
+library(xtable)
+library(broom)
 library(broom.helpers)
 ```
 
@@ -81,6 +83,10 @@ library(tidyverse)
 ```{r import-data}
 # Import CSV data
 data_raw <- read_csv("Data/wmmics.csv")
+
+# Online download
+# urlfile <- "https://raw.githubusercontent.com/XtopheB/DataScience4OS/main/Data/wmmics.csv"
+# data_raw <- read_csv(urlfile)
 
 # Select only variables needed (uppercase)
 wmfinal <- data_raw %>%
@@ -369,19 +375,9 @@ stargazer(model1,
                                "Married/Partnered"),
           apply.coef = exp,  # Convert to odds ratios
           single.row = TRUE,
-          ci = TRUE,
           ci.level = 0.95)
 ```
 
-```{r table-model1}
-# Display with gtsummary
-tbl_regression(model1,
-               estimate_fun = label_style_number(digits = 3)) %>%
-  add_glance_table() %>%
-  bold_p() %>%
-  bold_labels()
-  
-```
 
 ## Model 2: Without Urban/Rural
 
@@ -391,6 +387,26 @@ model2 <- svyglm(dv ~ EDU + windex + MA,
                  family = quasibinomial())
 
 summary(model2)
+```
+```{r}
+modelsummary(model1,stars = TRUE, 
+             output = "latex", shape = model~term, 
+             estimate = "{conf.low} - {conf.high}",
+             statistic = c("statistic", "p.value"),
+             fmt = 3,
+             gof_omit = ".*",
+             coef_rename = c(
+               "(Intercept)" = "Intercept",
+               "UBNUrban" = "Urban",
+               "age" = "Age",
+               "EDUVocational" = "Vocational",
+               "EDUUniversity" = "University",
+               "windexSecond" = "Second Quintile",
+               "windexMiddle" = "Middle Quintile",
+               "windexFourth" = "Fourth Quintile",
+               "windexRichest" = "Richest Quintile",
+               "MAMarried/Partnered" = "Married/Partnered"
+             ))
 ```
 
 
@@ -444,6 +460,8 @@ tbl_merge(
 ```
 
 # Visualizations
+
+
 
 # Conclusions
 
