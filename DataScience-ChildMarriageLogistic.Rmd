@@ -81,7 +81,14 @@ $$
 Our data set being in the directory `Data`, we need to specify the right path when loading the data. Here the data are in SPSS format ($.sav$) and we need a specific package  (*haven*) to load the data. 
 
 ```{r}
+## Load data locally
 wm <- read_spss(file ="Data/wm_Lao_2017.sav", user_na = TRUE)
+
+## Online download
+# urlfile <- "https://raw.githubusercontent.com/XtopheB/DataScience4OS/main/Data/wm_Lao_2017.sav"
+# wm <- read_spss(file = urlfile, user_na = TRUE)
+
+# As a data frame
 wm <- as.data.frame(wm)
 ```
 
@@ -177,7 +184,7 @@ kable(tt, digits =2, caption = "Child marriage vs Area")
 
 ## Logistic regression
 
-We will use the DHS survey at the individual level and construct a binary response variable indicating whether there was marriage before 15 years old (or "*girl's marriage*"). We will try to understand which factor**S** may affect the probability to observe girl's marriage, and in particular whether, after controlling for the usual individual factors such as education, wealth and other socioeconomic factors, there is also an impact of environmental factors.   
+We will use the DHS survey at the individual level and construct a binary response variable indicating whether there was **marriage before 18 years** old (or "*girl's marriage*"). We will try to understand which factor**S** may affect the probability to observe girl's marriage, and in particular whether, after controlling for the usual individual factors such as education, wealth and other socioeconomic factors, there is also an impact of environmental factors.   
 
 
 ```{r}

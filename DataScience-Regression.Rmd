@@ -50,7 +50,7 @@ We need to load the data (here from SIAP's server) but also from your computer
 
 ```{r summary}
 # We load the data from SIAP's server where we stored the .csv file
-SouthAfrica <-read.csv2("https://www.unsiap.or.jp/on_line/ML/MLData/ML_SouthAfrica.csv")
+# SouthAfrica <-read.csv2("https://www.unsiap.or.jp/on_line/ML/MLData/ML_SouthAfrica.csv")
 
 # From your computer if you have the dataset
 SouthAfrica <-read.csv2("Data/ML_SouthAfrica.csv")

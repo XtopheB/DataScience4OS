@@ -1,5 +1,5 @@
 ---
-title: "A step-by-step Analysis- Descriptive"
+title: "Logistic Regression in practice"
 subtitle: "NSB course - Thimphu"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
@@ -76,7 +76,7 @@ library(tidyverse)
 ######################
 
 
-# Data Import and Preparation
+# Data Preparation
 
 ## Reading Data
 
