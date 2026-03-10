@@ -7,6 +7,9 @@ output:
   html_document:
     code_folding: show
     highlight: tango
+    toc: yes
+    toc_float: true
+    keep_md: no
     number_sections: no
     theme: lumen
   word_document: default
@@ -73,12 +76,12 @@ Our data set being in the directory `Data/MICSBhutan`, we need to specify the ri
 
 ```{r}
 ## Load data locally
-wm  <- read_spss(file ="Data/MICSBhutan/wm.sav", user_na = TRUE)
+#wm  <- read_spss(file ="Data/MICSBhutan/wm.sav", user_na = TRUE)
 
 
 ## Online download
-# urlfile <- "https://raw.githubusercontent.com/XtopheB/DataScience4OS/main/Data/MICSBhutan/hh.sav"
-# wm <- read_spss(file = urlfile, user_na = TRUE)
+urlfile <- "https://raw.githubusercontent.com/XtopheB/DataScience4OS/main/Data/MICSBhutan/wm.sav"
+wm <- read_spss(file = urlfile, user_na = TRUE)
 
 # As a data frame
 wm <- as.data.frame(wm)
@@ -108,7 +111,6 @@ Then we need to keep only observations corresponding to our definition: **Women 
 df$age <- as.numeric(as.character(df$WB2))
 
 #Select only women ages between 20 and 24 and those completed the survey
-
 df <- df %>%
   filter(WM7 == 1,
          age >= 20, 
@@ -142,23 +144,22 @@ df <- df %>%
                              ),
          region = factor(region, 
                             levels = c(1, 2, 3),
-                            labels = c("Western", "Central", "Eastern")), 
-         welevel <- factor(welevel, 
+                            labels = c("Western", "Central", "Eastern")
+                         ), 
+         welevel = factor(welevel, 
                            levels = c(1, 2, 3),
-                          labels = c("None", "Primary", "Secondary+")), 
-         
+                           labels = c("None", "Primary", "Secondary+")) 
            )
 
 # Also creating a binary variable  that records 1 for child marriage and 0 otherwise
 # That variable must be a factor variable
 
-
 df <- df %>%
   mutate(Before18 = if_else(WAGEM < 18, 1, 0),
          Before18 = factor(Before18,
                            levels = c(0, 1),
-                           labels = c("Married 18+", "Child Marriage")))
-
+                           labels = c("Married 18+", "Child Marriage"))
+         )
 
 
 ```
@@ -167,7 +168,7 @@ df <- df %>%
 ```{r}
 # Keeping only useful
 df <-df %>%
-  select(age, WAGEM, region,  welevel, wealth, WAGEM, MA1, HH7, HH1, wmweight)
+  select(Before18, age, WAGEM, region,  welevel, wealth, WAGEM, MA1, HH7, HH1, wmweight)
 ```
 
 
@@ -213,9 +214,10 @@ kable(tt, digits =2, caption = "Child marriage vs Area")
 ```
 
 
-## Logistic regression
+# Logistic regression
 
-We will use the DHS survey at the individual level and construct a binary response variable indicating whether there was **marriage before 18 years** old (or "*girl's marriage*"). We will try to understand which factor**S** may affect the probability to observe girl's marriage, and in particular whether, after controlling for the usual individual factors such as education, wealth and other socioeconomic factors, there is also an impact of environmental factors.   
+We will use the DHS survey at the individual level and construct a binary response variable indicating whether there was **marriage before 18 years** old (or "*girl's marriage*"). We will try to understand which factor**S** may affect the probability to observe girl's marriage, such as education, wealth and other socioeconomic factors.   
+
 
 
 ```{r}
@@ -223,14 +225,14 @@ We will use the DHS survey at the individual level and construct a binary respon
 Y<-"Before18"               # Response variable
 
 
-XCovars <- c("age", "welevel", "wealth")
+XCovars <- c("age", "welevel", "wealth", "region")
 formula_string <- paste(Y, paste(XCovars, collapse = " + "), sep = " ~ ")
 
 print(paste(" Regression formula: ",formula_string))
 
 ```
 
-### Results {-}
+## Results {-}
 We use a logit model with several explanatory variables
 
 ```{r, results='asis'}
@@ -268,8 +270,6 @@ misclass <- round(100* (FP+FN)/ (TN+TP+FN+FP), 1)
 
 accuracy <- round(100* (TP + TN) /(TN+TP+FN+FP),1)
 accuracy
-
-
 ```
 In total, the model misclassified ( `r FP`   + `r FN` / `r nrow(df)`) = **`r misclass` %** of the outcome, which yields **an accuracy of `r accuracy` per cent** .
 
@@ -283,32 +283,25 @@ p_educ <- visreg(glm.fit, "welevel", scale="response", rug=0,  # for rugs =2
                  ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-p_educ
-
 p_wealth <- visreg(glm.fit, "wealth", scale="response", rug=0,  # for rugs =2
                    xlab="Wealth index",
                    ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-p_wealth
-
 p_age <- visreg(glm.fit, "age", scale="response", rug=0,  # for rugs =2
-                   xlab="Age (in 2017)",
+                   xlab="Age",
                    ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-
-# p_area <- visreg(glm.fit, "region", scale="response", rug=0,  # for rugs =2
-#                    xlab="Urban vs Rural",
-#                    ylab="Prob(Child Marriage)", gg=TRUE) + 
-#   ylim(0,1) +theme_minimal()
-# 
-# p_area
+p_area <- visreg(glm.fit, "region", scale="response", rug=0,  # for rugs =2
+                   xlab="Region",
+                   ylab="Prob(Child Marriage)", gg=TRUE) +
+  ylim(0,1) +theme_minimal()
 
 ## Combining the graphics
-figure <- ggarrange( p_educ, p_wealth, p_age, # p_area,
-                     #labels = c("Edudation", "wealth"  "Age"),
-                     ncol = 4, nrow = 1)
+figure <- ggarrange( p_educ, p_wealth, p_age,  p_area,
+                     #labels = c("Education", "wealth"  "Age"),
+                     ncol = 2, nrow = 2)
 
 figure
 ```
@@ -316,19 +309,23 @@ figure
 
 We can see the marginal effects  of significant predictors in the model. 
 
-As the level of education increases, the probability decreases. We can notice a clear drop in the probability between the category 3 "middle" and  4 “Fourth”. Also, all things being equal, the probability of child marriage decreases with the increase of the level of wealth. 
+As the level of education increases, the probability decreases. We can notice a clear drop in the probability between the category 2 "primary" and  3 “Secondary+”. 
+
+Surprisingly, all things being equal, the probability of child marriage does not significantly decrease with the increase of the level of wealth. 
 
 The probability of being married before 18 decreases also with age. This shows a lower prevalence of the practice in the past.
 
-# But the analysis is not correct...
-There is a sampling protocol and we should integrate the weights for each household. For that, we'll use the package  `survey`
+Less significant, there seems to be a small effect of the region "central" where the probability is higher. 
+
+# But the analysis is not really "correct"...
+There is a sampling protocol and we should integrate the **weights** for each household. For that, we'll use the package  `survey`
 
 ```{r}
 # Declaring survey sample design/weights and creating tables 
 library(survey)
 ```
 
-We have the find the variables that define the strata and the weights 
+Fortunately, we knowthe variables that define the strata and the weights 
 
 ```{r}
 wmdesign<-svydesign(id= ~HH1,strata= ~HH7, weights = ~wmweight, nest=TRUE, data=df)
@@ -349,6 +346,7 @@ colPercents(svytable(~Before18+wealth, wmdesign,round=TRUE))
 
 ```{r}
 # Full model with sampling design included
+# We use the same model as previously
 
 wm.sglm1 <- svyglm(formula = formula_string, 
                    design = wmdesign, 
@@ -367,33 +365,29 @@ pnew_educ <- visreg(wm.sglm1, "welevel", scale="response", rug=0,  # for rugs =2
                  ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-pnew_educ
-
 pnew_wealth <- visreg(wm.sglm1, "wealth", scale="response", rug=0,  # for rugs =2
                    xlab="Wealth index",
                    ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-pnew_wealth
-
 pnew_age <- visreg(wm.sglm1, "age", scale="response", rug=0,  # for rugs =2
-                   xlab="Age (in 2017) ",
+                   xlab="Age",
                    ylab="Prob(Child Marriage)", gg=TRUE) + 
   ylim(0,1) +theme_minimal()
 
-pnew_age
 
+pnew_area <- visreg(wm.sglm1, "region", scale="response", rug=0,  # for rugs =2
+                   xlab="Region",
+                   ylab="Prob(Child Marriage)", gg=TRUE) +
+  ylim(0,1) +theme_minimal()
 
 ## Combining the graphics
-New_figure <- ggarrange( pnew_educ, pnew_wealth, pnew_age,
-                     #labels = c("Edudation", "wealth"  "Age"),
-                     ncol = 3, nrow = 1)
+New_figure <- ggarrange( pnew_educ, pnew_wealth, pnew_age, pnew_area,
+                     # labels = c("Education", "wealth" , "Age", "Region"),
+                     ncol = 2, nrow = 2)
 
 New_figure
-
-
 ```
-
 
 
 # Conclusion
@@ -402,12 +396,9 @@ The results suggest that:
 
 -  “*Education*”, 
 - “*Age*”, 
-and 
-- “*wealth*” 
+and, to a lesser extend, 
+- “*region*” 
 
-are important variables in explaining and predicting the outcome of marriage before 18 in Lao.
+are important variables in explaining and predicting the outcome of marriage before 18 in Bhutan.
 
-It is intuitive that “Education” and "wealth" empowers women and it significantly reduces the probability of being married before 18. 
-
-
-Further research is needed to provide insights on these findings. 
+It is intuitive that “Education” empowers women and it significantly reduces the probability of being married before 18. Surprisingly, "Wealth" does not play a role here, while this is something  often observed in such analysis. Further research is needed to provide insights on these findings. 
