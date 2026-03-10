@@ -1,6 +1,6 @@
 ---
 title: "Logistic Regression in practice"
-subtitle: "NSB course - Thimphu"
+subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:

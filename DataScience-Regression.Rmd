@@ -1,6 +1,6 @@
 ---
 title: "A step-by-step Analysis- Regression"
-subtitle: "NSB course - Thimphu"
+subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:

@@ -1,6 +1,6 @@
 ---
 title: "Analysing Child Marriage with Logistic Regression"
-subtitle:  "NSB course - Thimphu"
+subtitle:  "NSB course - Paro"
 author: "Christophe Bontemps SIAP"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -72,8 +72,6 @@ $$
 
 - Covers both formal unions (marriages) and informal unions (cohabitation)
 - SDG indicator captures only child marriage among **girls**.
-
-
 
 
 ## Read the data
