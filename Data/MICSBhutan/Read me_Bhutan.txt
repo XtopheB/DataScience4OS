@@ -1,0 +1,47 @@
+In this compressed WINZIP folder you will find the MICS4 datasets for the selected 
+country. 
+
+Five SPSS data files were produced, corresponding to the units of analysis: 
+Households - hh.sav 
+Household members - hl.sav
+Women in reproductive age (15-49 years of age) – wm.sav
+Mothers or primary caretakers of children under the age of five – ch.sav
+Maternal mortality - mm.sav
+
+The characteristics of the data such as sample size, weights, variable labels and 
+information on recoded or imputed variables can be found within the survey archive 
+which will be made available shortly on http://www.childinfo.org/mics4_surveys.html The survey archive will also contain the questionnaires and information on the sampling and 
+implementation of the survey.  
+
+Access Conditions:
+
+Survey datasets are distributed at no cost for legitimate research, with the condition that 
+we receive a description of the objectives of any research project that will be using the 
+data prior to authorizing their distribution. 
+
+Copies of all reports and publications based on the requested data must be sent to the 
+following:
+
+1. Kuenga Tshering 
+Director
+National Statistical Bureau
+Thimphu, Bhutan
+Telephone: +975-2-334265 
+Email add: ktshering@nsb.gov.bt
+
+2. Dr. Gepke Hingst, UNICEF Representative
+UNICEF Bhutan, Post Box 239
+Lhaki Lam 1-10, Thimphu, Bhutan
+Tel: mobile +975 17110191, direct line + 975 2 322959, office + 975 2 331369
+Email add: ghingst@unicef.org
+
+3. Kinlay Penjor
+Planning Officer
+Planning, Monitoring & Communication, UNICEF, Bhutan
+P.O Box No. 239, Lhaki Lam 1-10
+Thimphu, Bhutan
+office + 975 2 331369
+Email add: kpenjor@unicef.org
+
+
+The above contact details are as of 14 March 2012. Please contact: Dechen Zangmo at dzangmo@unicef.org for any updates.
