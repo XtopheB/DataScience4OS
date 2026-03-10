@@ -12,12 +12,17 @@ output:
     keep_md: no
     number_sections: no
     theme: lumen
-  word_document: default
   pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set( message = FALSE, warning = FALSE, results =TRUE, echo = TRUE) 
+
+# Fix tabularray issue globally
+options(modelsummary_format_numeric_latex = "plain")
+options(knitr.table.format = "simple")  
+
 ```
 
 
