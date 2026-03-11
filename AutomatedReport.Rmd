@@ -1,5 +1,5 @@
 ---
-title: "My first report"
+title: "Report for Trade Statistics"
 subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date: "`r Sys.Date()`"
@@ -14,6 +14,17 @@ output:
   word_document:
     toc: yes
 ---
+
+```{r}
+# Select one product for time analysis
+# Other options: "Kava", "Coffee", "Alcoholic Drinks"
+Mygood <- "Coffee"  
+
+```
+
+
+# An automatic report on  `r Mygood` for  (fictitious) Esdeegia National Statistical Office 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set( message = FALSE, warning = FALSE, results =TRUE, echo = TRUE) 
@@ -31,7 +42,7 @@ library(tidyverse)
 library(flextable)
 ```
 
-# An automatic report for  (fictitious) Esdeegia National Statistical Office 
+
 
 This is my *first* report using **Rmarkdown**. I will use a different data set:
 
@@ -43,22 +54,22 @@ Mydata <- read.csv("Data/TradeData.csv")
 
 ```
 
-## Number of rows
+## Raw Data Analysis  
 I have **here  `r  nrow(Mydata)`  observations**
 
 ```{r}
 nrow(Mydata)
 ```
 
-### Summary statistics
+## Summary statistics
 
 ```{r }
 summary(Mydata$Stat_Value)
 ```
 
-## Data Manipulation
+# Data Manipulation
 
-### Defining the variables with the right "type" 
+## Defining the variables with the right "type" 
 
 R is a ***typed*** language with six primary data *types* that variables can hold (numeric,integer, character,  logical, ...). The type determines what kind of data the variable stores and which operations can be performed on it. 
 
@@ -97,7 +108,9 @@ set_flextable_defaults(
 flextable(CommodityByType)
 ```
 
-## Graphic
+# Graphical Analysis
+
+Principal Exports over the period
 
 ```{r}
 # Plot the exports
@@ -116,16 +129,7 @@ p
 ```
 
 
-## Focus on a specific good
-
-```{r}
-# Select one product for time analysis
-# Other options: "Kava", "Coffee", "Alcoholic Drinks"
-Mygood <- "Wood"  
-
-```
-
-> From now , we focus on `r Mygood`
+# Focus on `r Mygood` exports
 
 We have `r nrow(filter(Mydata, Principle_Exports== Mygood))` observations for the product `r Mygood`
 
@@ -182,7 +186,13 @@ p
 
 ```
 
+```{r, include=FALSE}
+# Word document cannot handle interactive documents
+# uncomment if output is word
+# knitr::knit_exit()
+```
 
+# Interactive version
 
 ```{r}
 library(plotly)
@@ -229,5 +239,8 @@ sankeyNetwork(
 )
 ```
 
+```{r}
+
+```
 
 
