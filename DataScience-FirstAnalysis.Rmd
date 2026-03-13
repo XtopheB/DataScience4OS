@@ -391,6 +391,7 @@ This model:
 ggplot(data, aes(education, income)) +
   geom_point(alpha = 0.4, color = SIAP.color) +
   geom_smooth(method = "lm", se = FALSE, color = "grey") +
+  # geom_abline(intercept = 600, color = "darkred", linewidth = 1.5) +  # For illustation
   labs(
     title = "Income and education",
     subtitle = "Regression line adjusted for age and sex",
