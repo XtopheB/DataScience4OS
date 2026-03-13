@@ -1,0 +1,57 @@
+---
+title: "International Merchandise Trade Statistics Highlights"
+author: "Your name"
+subtitle: '*A simple report*'
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float: true
+    code_folding: hide
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+# Data analysis
+We provide here some basic elements about the data set and descriptive statistics on some variables of interest.  
+
+* First we load the data
+* second we print a summary
+
+```{r}
+TradeData <- read.csv("https://www.unsiap.or.jp/on_line/2024/RAP/Data/TradeData.csv")
+```
+
+We loaded the data set and compile the  report on `r Sys.Date()`
+
+## Summary statistics
+Here are some summary statistics of the export value (*Stat_Value* variable), all products combined:
+
+```{r }
+summary(TradeData$Stat_Value)
+```
+
+The data set contains   **`r  nrow(TradeData)`  observations**, and  **`r  ncol(TradeData)`** variables.
+
+Here is a list of all variables available in the data set: 
+
+```{r}
+names(TradeData)
+```
+
+## Type of exports
+
+The variable *Principle_Export* list all the types of goods exported from Vanuatu. There are **`r length(unique(TradeData$Principle_Exports))`** different goods exported. Let's have the list of all these goods. 
+
+```{r}
+unique(TradeData$Principle_Exports)
+
+```
+
+
+
+
+
+
