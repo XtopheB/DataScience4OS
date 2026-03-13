@@ -187,4 +187,175 @@ The model **explains `r R2`** of the variation in food share (R2), indicating th
 
 Overall, these results confirm the inverse relationship between household expenditure and the proportion of spending devoted to food, highlighting how food share decreases as income rises.
 
+```{r}
+knit_exit()
+```
+
+
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+
+# Base function to create normal curve data
+normal_data <- function(from = -4, to = 4) {
+  tibble(x = seq(from, to, length.out = 500),
+         y = dnorm(x))
+}
+
+shade_area <- function(data, from, to) {
+  data %>% filter(x >= from & x <= to)
+}
+
+# Clean minimal theme - no grid
+theme_curve <- function() {
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.y  = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.x  = element_line(color = "grey50", linewidth = 0.4)
+  )
+}
+
+
+# Helper to get curve height at a given t
+curve_y <- function(t) dnorm(t)
+```
+
+
+```{r}
+# ── Graphic 1: Standard normal curve ──────────────────────────
+p1 <- ggplot(normal_data(), aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_segment(aes(x = 0, xend = 0,
+                   y = 0, yend = curve_y(0)),  # stops exactly at curve
+               color = "gray",
+               linetype = "solid", linewidth = 1) +
+  # geom_area(fill = "steelblue", alpha = 0.15) +
+  labs(title = "Distribution of beta", x = NULL, y = NULL) +
+  theme_curve()
+p1
+```
+
+
+```{r}
+# ── Graphic 2: Low t-value (NOT significant) ──────────────────────
+
+t_low <- 0.4
+
+p2 <- ggplot(normal_data(), aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_segment(aes(x = 0, xend = 0,
+                   y = 0, yend = curve_y(0)),  # stops exactly at curve
+               color = "lightgray",
+               linetype = "solid", linewidth = 1) +
+  geom_segment(aes(x = t_low, xend = t_low,
+                   y = 0, yend = curve_y(t_low)),  # stops exactly at curve
+               color = "firebrick",
+               linetype = "dashed", linewidth = 1) +
+  annotate("text", x = t_low, y = -0.02,
+           label = paste("t =", t_low),
+           color = "firebrick", size = 4.5, vjust = 1) +
+  labs(title = "Not Significant (low t)", x = NULL, y = NULL) +
+  coord_cartesian(clip = "off") +
+  theme_curve()
+p2
+```
+
+
+```{r}
+# ── Graphic 2bis with area  Low t-value (NOT significant) ──────────────────────
+
+p2A <- ggplot(normal_data(), aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_segment(aes(x = t_low, xend = t_low,
+                   y = 0, yend = curve_y(t_low)),  # stops exactly at curve
+               color = "firebrick",
+               linetype = "dashed", linewidth = 1) +
+   geom_segment(aes(x = 0, xend = 0,
+                   y = 0, yend = curve_y(0)),  # stops exactly at curve
+               color = "lightgray",
+               linetype = "solid", linewidth = 1) +
+   geom_area(data = shade_area(normal_data(), t_low, 4),
+            fill = "steelblue", alpha = 0.4) +
+  annotate("text", x = t_low, y = -0.02,
+           label = paste("t =", t_low),
+           color = "firebrick", size = 4.5, vjust = 1) +
+  labs(title = "Not Significant (low t)", x = NULL, y = NULL) +
+  # Area
+  annotate("text", x = 2.1, y = 0.13,
+         label = "Area =\n p-value",
+         color = "steelblue", size = 4, hjust = 0) +
+  annotate("segment", x = 2.5, xend = 2.1,
+                    y = 0.10, yend = 0.04,
+         arrow = arrow(length = unit(0.2, "cm")),
+         color = "steelblue")+
+  coord_cartesian(clip = "off") +
+  theme_curve()
+  
+p2A
+```
+
+
+```{r}
+# ── Graphic 3: Large t-value (significant) ────────────────
+t_large <- 1.8
+
+p3 <- ggplot(normal_data(), aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+   geom_segment(aes(x = 0, xend = 0,
+                   y = 0, yend = curve_y(0)),  # stops exactly at curve
+               color = "lightgray",
+               linetype = "solid", linewidth = 1) +
+  geom_segment(aes(x = t_large, xend = t_large,
+                   y = 0, yend = curve_y(t_large)),  # stops exactly at curve
+               color = "firebrick",
+               linetype = "dashed", linewidth = 1) +
+  annotate("text", x = t_large, y = -0.02,
+           label = paste("t =", t_large),
+           color = "firebrick", size = 4.5, vjust = 1) +
+  labs(title = "Significant (large t)", x = NULL, y = NULL) +
+  coord_cartesian(clip = "off") +
+  theme_curve()
+
+p3
+```
+
+
+
+```{r}
+# ── Graphic 3bis with p-value : Large t-value (significant) ────────────────
+
+p3A <- ggplot(normal_data(), aes(x, y)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+   geom_segment(aes(x = 0, xend = 0,
+                   y = 0, yend = curve_y(0)),  # stops exactly at curve
+               color = "lightgray",
+               linetype = "solid", linewidth = 1) +
+  geom_segment(aes(x = t_large, xend = t_large,
+                   y = 0, yend = curve_y(t_large)),  # stops exactly at curve
+               color = "firebrick",
+               linetype = "dashed", linewidth = 1) +
+  geom_area(data = shade_area(normal_data(), t_large, 4),
+            fill = "steelblue", alpha = 0.4) +
+  annotate("text", x = t_large, y = -0.02,
+           label = paste("t =", t_large),
+           color = "firebrick", size = 4.5, vjust = 1) +
+  # Area
+  annotate("text", x = 2.1, y = 0.13,
+         label = "Area =\n p-value",
+         color = "steelblue", size = 4, hjust = 0) +
+  annotate("segment", x = 2.5, xend = 2.1,
+                    y = 0.10, yend = 0.04,
+         arrow = arrow(length = unit(0.2, "cm")),
+         color = "steelblue")+
+  coord_cartesian(clip = "off") +
+  theme_curve() 
+  
+
+p3A
+```
+
+
 
