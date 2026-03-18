@@ -4,6 +4,8 @@ subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
+  pdf_document: default
+  word_document: default
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -12,8 +14,6 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
-  word_document: default
-  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -188,7 +188,7 @@ The model **explains `r R2`** of the variation in food share (R2), indicating th
 Overall, these results confirm the inverse relationship between household expenditure and the proportion of spending devoted to food, highlighting how food share decreases as income rises.
 
 ```{r}
-knit_exit()
+knitr::knit_exit()
 ```
 
 

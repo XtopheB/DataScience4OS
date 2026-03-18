@@ -407,3 +407,9 @@ and, to a lesser extend,
 are important variables in explaining and predicting the outcome of marriage before 18 in Bhutan.
 
 It is intuitive that “Education” empowers women and it significantly reduces the probability of being married before 18. Surprisingly, "Wealth" does not play a role here, while this is something  often observed in such analysis. Further research is needed to provide insights on these findings. 
+
+
+```{r}
+knitr::knit_exit()
+```
+

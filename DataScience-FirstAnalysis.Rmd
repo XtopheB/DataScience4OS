@@ -356,14 +356,14 @@ modelsummary(
 ## Linear model with all variables
 
 ```{r, echo=TRUE}
-model <- lm(income ~ education + age + sex , data = data)
+modelMulti <- lm(income ~ education + age + sex , data = data)
 summary(model)
 ```
 
 
 ```{r}
 modelsummary(
-  modelUni,
+  modelMulti,
   statistic = "std.error",
   stars = TRUE,
   output = "html"

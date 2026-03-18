@@ -141,7 +141,6 @@ ExportsByType_Year <- TradeData %>%
 
 ```
 
-
 ```{r}
 flextable(ExportsByType_Year)
 ```
@@ -163,6 +162,9 @@ ExportsByType_Year  %>%
 
 ```
 
+```{r}
+knitr::knit_exit()
+```
 
 
 

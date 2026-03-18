@@ -4,12 +4,12 @@ author: "Your name"
 subtitle: '*A simple report*'
 date: "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     toc_float: true
     code_folding: hide
-  pdf_document:
-    toc: yes
   word_document:
     toc: yes
 ---
@@ -48,6 +48,10 @@ The variable *Principle_Export* list all the types of goods exported from Vanuat
 ```{r}
 unique(TradeData$Principle_Exports)
 
+```
+
+```{r}
+knitr::knit_exit()
 ```
 
 

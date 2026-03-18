@@ -4,13 +4,13 @@ subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date: "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     code_folding: show
     toc_float: true
     df_print: paged
-  pdf_document:
-    toc: yes
   word_document:
     toc: yes
 ---
@@ -22,9 +22,7 @@ Mygood <- "Coffee"
 
 ```
 
-
-# An automatic report on  `r Mygood` for  (fictitious) Esdeegia National Statistical Office 
-
+# An automatic report on  ***`r Mygood`*** for  (fictitious) Esdeegia National Statistical Office 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set( message = FALSE, warning = FALSE, results =TRUE, echo = TRUE) 
@@ -41,8 +39,6 @@ library(tidyverse)
 # For tables display
 library(flextable)
 ```
-
-
 
 This is my *first* report using **Rmarkdown**. I will use a different data set:
 
@@ -240,7 +236,7 @@ sankeyNetwork(
 ```
 
 ```{r}
-
+knitr::knit_exit()
 ```
 
 

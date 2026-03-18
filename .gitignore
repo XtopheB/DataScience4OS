@@ -10,6 +10,9 @@
 .RData
 .RDataTmp
 *.Rproj
+
+#  Outputs
+*.zip
 # User-specific files
 .Ruserdata
 # Example code in package build process

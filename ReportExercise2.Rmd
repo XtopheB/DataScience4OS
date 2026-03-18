@@ -40,7 +40,6 @@ names(TradeData)
 ```
 
 
-
 The variable *Principle_Export* list all the types of goods exported from Esdeegia. There are **YYYY** different goods exported. Let's have the list of all these goods. 
 
 ```{r}
@@ -48,5 +47,7 @@ unique(TradeData$Principle_Exports)
 
 ```
 
-
+```{r}
+knitr::knit_exit()
+```
 
