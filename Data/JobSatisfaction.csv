@@ -1,0 +1,9 @@
+,Education,Age,Income,Satisfaction
+1,College,Inf 50 yo,Inf 60 k$ ,643
+2,College,Inf 50 yo,Sup 60 k$,735
+3,College,Sup 50 yo,Inf 60 k$ ,793
+4,College,Sup 50 yo,Sup 60 k$,926
+5,No College,Inf 50 yo,Inf 60 k$ ,590
+6,No College,Inf 50 yo,Sup 60 k$,863
+7,No College,Sup 50 yo,Inf 60 k$ ,724
+8,No College,Sup 50 yo,Sup 60 k$,662
