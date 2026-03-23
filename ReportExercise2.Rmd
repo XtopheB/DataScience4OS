@@ -1,13 +1,13 @@
 ---
-title: "My title"
-author: "Your name"
+title: "International Merchandise Trade Statistics Highlights"
+author: "Christophe"
 output:
-  pdf_document:
-    toc: no
   html_document:
     toc: no
     code_folding: show
     df_print: paged
+  pdf_document:
+    toc: no
   word_document:
     toc: no
 ---
@@ -31,7 +31,15 @@ Here are some summary statistics of the export value (*Stat_Value* variable), al
 summary(TradeData$Stat_Value)
 ```
 
-The data set contains   **`r  nrow(TradeData)`  observations**, and  **XXXX** variables.
+
+```{r NbGoods}
+#  This is the number of different goods 
+TradeGoods <- length(unique(TradeData$Principle_Export))
+
+```
+
+
+The data set contains   **`r  nrow(TradeData)`  observations**, and  ***`r TradeGoods`*** variables.
 
 Here is a list of all variables available in the data set: 
 
@@ -40,10 +48,10 @@ names(TradeData)
 ```
 
 
-The variable *Principle_Export* list all the types of goods exported from Esdeegia. There are **YYYY** different goods exported. Let's have the list of all these goods. 
+The variable *Principle_Export* list all the types of goods exported from Esdeegia. There are **`r  length(unique(TradeData$Principle_Export))`** different goods exported. Let's have the list of all these goods. 
 
 ```{r}
-unique(TradeData$Principle_Exports)
+unique(TradeData$Principle_Export)
 
 ```
 

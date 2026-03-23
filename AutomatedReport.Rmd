@@ -2,17 +2,17 @@
 title: "Report for Trade Statistics"
 subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
-date: "`r Sys.Date()`"
+date: "`r format(Sys.time(), '%A, %d %B %Y, %H:%M')`"
 output:
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
   html_document:
     toc: yes
     code_folding: show
     toc_float: true
     df_print: paged
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
 
 ```{r}
@@ -46,7 +46,10 @@ This is my *first* report using **Rmarkdown**. I will use a different data set:
 * second we print a summary
 
 ```{r TradeDataLoading, echo=FALSE}
-Mydata <- read.csv("Data/TradeData.csv")
+# We can use the data locally or from SIAP server
+
+# Mydata <- read.csv("Data/TradeData.csv")
+TradeData <- read.csv("https://www.unsiap.or.jp/on_line/2024/RAP/Data/TradeData.csv")
 
 ```
 

@@ -4,14 +4,14 @@ author: "Christophe Bontemps (SIAP)"
 subtitle: '*A simple report*'
 date: "`r Sys.Date()`"
 output:
+  word_document:
+    toc: yes
   pdf_document:
     toc: yes
   html_document:
     toc: yes
     toc_float: true
     code_folding: hide
-  word_document:
-    toc: yes
 ---
 
 
