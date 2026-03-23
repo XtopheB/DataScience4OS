@@ -6,19 +6,19 @@ date: "`r Sys.Date()`"
 output:
   pdf_document:
     toc: yes
+  word_document:
+    toc: yes
   html_document:
     toc: yes
     code_folding: show
     toc_float: true
     df_print: paged
-  word_document:
-    toc: yes
 ---
 
 ```{r}
 # Select one product for time analysis
 # Other options: "Kava", "Coffee", "Alcoholic Drinks"
-Mygood <- "Coffee"  
+Mygood <- "Kava"  
 
 ```
 
@@ -185,7 +185,7 @@ p
 ```{r, include=FALSE}
 # Word document cannot handle interactive documents
 # uncomment if output is word
-# knitr::knit_exit()
+ knitr::knit_exit()
 ```
 
 # Interactive version
