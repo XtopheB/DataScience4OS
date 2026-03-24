@@ -362,7 +362,6 @@ New_figure
 ```
 
 
-
 # Conclusion
 
 The results suggest that: 

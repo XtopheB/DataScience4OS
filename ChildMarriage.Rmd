@@ -4,12 +4,12 @@ subtitle: "A step-by-step case study with Lao data "
 author: "Christophe Bontemps SIAP"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  word_document: default
   html_document:
     code_folding: show
     highlight: tango
     number_sections: no
     theme: lumen
+  word_document: default
   pdf_document: default
 ---
 

@@ -72,21 +72,18 @@ library(tidyverse)
 
 ```
 
-
-######################
-
-
 # Data Preparation
 
 ## Reading Data
 
 ```{r import-data}
-# Import CSV data
-data_raw <- read_csv("Data/wmmics.csv")
+# Import CSV data from local directory 
+urlfile <-"Data/wmmics.csv"
 
-# Online download
+# or Online download
 # urlfile <- "https://raw.githubusercontent.com/XtopheB/DataScience4OS/main/Data/wmmics.csv"
-# data_raw <- read_csv(urlfile)
+
+data_raw <- read_csv(urlfile)
 
 # Select only variables needed (uppercase)
 wmfinal <- data_raw %>%
@@ -296,8 +293,6 @@ svytable(~windex + EDU, design) %>%
              subtitle = "Column percentages") %>%
   fmt_percent(columns = -windex, decimals = 1)
 ```
-
-# Visualizing
 
 
 ## Domestic Violence Prevalence by Key Variables
