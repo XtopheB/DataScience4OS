@@ -31,20 +31,27 @@ Parallel Coordinate Plots (PCP) are a powerful visualization technique for explo
 
 
 # Load Libraries
+Beofre being able to run this code, we should have 3 packages installed:
+- `tidyverse` is one of the main package for data science
+- `GGally` is a package that propose Parallel Coordinate Plots (PCP)
+- `plotly` is use to create interactive graphics
+
+Once installed, we can use (load) the library to use the many fucntions proposed.  
 
 ```{r load-libraries}
 library(tidyverse)
 library(GGally)      # For ggparcoord
 library(plotly)      # For interactive plots
-library(viridis)     # For color palettes
 ```
 
 # Data 
 
-```{r generate-data, include=FALSE}
+We generate the data for the sake of the exercise
+
+```{r generate-data}
 set.seed(123)
 
-# Create dataset with CLEAR group separation
+# Create dataset 
 data <- tibble(
   id = 1:10,
   sex = c(rep("Men", 6), rep("Women", 4)),
@@ -68,34 +75,6 @@ data <- tibble(
   )
 )
 
-```
-
-
-
-```{r export-csv, include=FALSE}
-# Export data to CSV
-
-Mydata<- data %>%
-  select(-sex)
-
-write_csv(data, "Data/pcp_tutorial_data.csv")
-write_csv(Mydata, "Data/pcp_Exercise_data.csv")
-
-```
-
-## Read CSV
-
-```{r}
-# read the data
-Mydata <- read.csv("Data/pcp_Exercise_data.csv")
-```
-
-```{r}
-
-# Display the data
-Mydata %>%
-  knitr::kable(caption = "Dataset for exercise (10 Observations)")
-```
 ```
 
 
@@ -128,7 +107,7 @@ ggparcoord(
   )
 ```
 
-**Observation:** Notice how the lines form two distinct groups, even though we haven't colored them by sex!
+**Observation:** Notice how the lines form two distinct groups, even though we haven't colored them.
 
 # Enhanced PCP with Transparency
 
@@ -161,7 +140,7 @@ ggparcoord(
 
 # PCP with Hidden Grouping
 
-Now let's color the lines by sex (but not show the legend), making the two groups visually distinct.
+Now let's color the lines by sex (a variable that was hidden before), making the two groups visually distinct.
 
 ```{r pcp-colored}
 # Add sex back for coloring
@@ -197,41 +176,19 @@ ggparcoord(
 - **Blue lines** (Men): Higher on age and income, moderate on education
 - **Red lines** (Women): Lower on age and income, higher on education
 
-# Beautiful PCP with Viridis Colors
-
-Using a gradient color scheme for a more sophisticated look.
-
-```{r pcp-viridis}
-ggparcoord(
-  data_with_sex,
-  columns = 3:5,
-  groupColumn = "sex",
-  scale = "uniminmax",
-  alphaLines = 0.8
-) +
-  scale_color_viridis_d(option = "plasma", end = 0.8) +
-  labs(
-    title = "Parallel Coordinate Plot with Viridis Colors",
-    subtitle = "Exploring relationships between age, education, and income",
-    x = "Variables",
-    y = "Normalized Values"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    legend.position = "none",
-    plot.title = element_text(face = "bold", size = 15),
-    plot.subtitle = element_text(color = "grey50", size = 11),
-    axis.text.x = element_text(face = "bold", size = 12),
-    panel.background = element_rect(fill = "#f8f9fa", color = NA),
-    plot.background = element_rect(fill = "white", color = NA),
-    panel.grid.major.x = element_line(color = "grey70", size = 0.8),
-    panel.grid.major.y = element_line(color = "grey90", size = 0.3)
-  )
-```
 
 # Interactive Parallel Coordinate Plot
 
 Finally, let's create an **interactive version** using `plotly` that allows hovering and filtering.
+
+## Interactive Features
+
+The interactive plot below allows you to:
+
+1. **Hover** over lines to see individual observation details
+2. **Click and drag** on any axis to filter the data
+3. **Reorder axes** by dragging axis labels
+4. **Zoom** into specific ranges
 
 ```{r interactive-pcp, fig.height=7}
 # Prepare data for plotly
@@ -292,14 +249,7 @@ fig <- fig %>%
 fig
 ```
 
-## Interactive Features
 
-The interactive plot above allows you to:
-
-1. **Hover** over lines to see individual observation details
-2. **Click and drag** on any axis to filter the data
-3. **Reorder axes** by dragging axis labels
-4. **Zoom** into specific ranges
 
 # Summary Statistics by Group
 
