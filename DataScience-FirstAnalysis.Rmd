@@ -4,26 +4,25 @@ subtitle: "NSB course - Paro"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
+  pdf_document: default
+  word_document: default
   html_document: 
     df_print: paged
     always_allow_html: true
-    toc: yes
+    toc: no
     toc_float: true
     keep_md: no
     code_folding: show
     code_download: true
-  pdf_document: default
-  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 # My default setting for this document
 knitr::opts_chunk$set(
-  echo = FALSE,
-  warning = FALSE,
-  message = FALSE,
-  cache = FALSE,
-  comment = NA
+	message = FALSE,
+	warning = FALSE,
+	cache = FALSE,
+	comment = NA
 )
 ```
 
@@ -162,7 +161,20 @@ data <- tibble(
       sex_education_bonus +
       rnorm(n(), 0, 60)
   )
+```
 
+
+```{r}
+write_csv(data, "Data/Household.csv")
+```
+
+
+```{r dataloading, include=FALSE}
+read.csv("Data/Household.csv")
+```
+
+
+```{r cleaning, echo=FALSE}
 # Data Simulation cleaning
 data <- data %>%
   select(income, age,  education, sex, education_level) %>%
@@ -206,7 +218,7 @@ datasummary_skim(data,
 ```
 
 ```{r}
-data %>%
+data_by_sex <-data %>%
   group_by(sex) %>%
   summarise(
     N = n(),
@@ -225,9 +237,7 @@ data %>%
 ## Average income by sex
 
 ```{r}
-data %>%
-  group_by(sex) %>%
-  dplyr::summarise(mean_income = mean(income), .groups = "drop") %>%
+data_by_sex %>%
   ggplot(aes(sex, mean_income, fill = sex)) +
   geom_col(width = 0.2) +
   scale_fill_manual(values = sex_colors) +
@@ -248,8 +258,10 @@ data %>%
 ## Scatter plot: income vs education
 
 ```{r basic-scatterplot}
-ggplot(data, aes(education, income)) +
-  geom_point(color = SIAP.color, alpha = 0.5) +
+data %>%
+ggplot() +
+  aes(education, income) +
+  geom_point(color = "lightblue", alpha = 0.8) +
   labs(
     title = "Scatter plot of Income vs education",
     x = "Education (Adjusted years)",
@@ -268,7 +280,7 @@ This suggests a positive relationship, but variability is large.
 ```{r}
 ggplot(data, aes(age, income)) +
   geom_point(alpha = 0.6, color = "darkgrey") +
-  # geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", se = FALSE) +
   labs(
     title = "Income and age",
     x = "Age",
@@ -285,7 +297,7 @@ The relationship is still hard to interpret clearly.
 ggplot(data, aes(education, income, color = age_group)) +
   geom_point(alpha = 0.6, position = position_jitter(width = 0.3, height = 0)) +
   facet_wrap(~ age_group) +
-  scale_color_manual(values = age_colors) +
+ # scale_color_manual(values = age_colors) +
   labs(
     title = "Income and education",
     subtitle = "Color is age group",
@@ -357,7 +369,7 @@ modelsummary(
 
 ```{r, echo=TRUE}
 modelMulti <- lm(income ~ education + age + sex , data = data)
-summary(model)
+summary(modelMulti)
 ```
 
 
@@ -372,7 +384,7 @@ modelsummary(
 
 ```{r}
 tab_model(
-  model,
+  modelMulti,
   title = "Regression of Income (Y)  on education, age and sex (Xs)",
   show.se = TRUE,
   show.p = TRUE,
@@ -410,7 +422,7 @@ pred_data <- expand.grid(
   age = mean(data$age)
 )
 
-pred_data$pred_income <- predict(model, newdata = pred_data)
+pred_data$pred_income <- predict(modelMulti, newdata = pred_data)
 
 ggplot(data, aes(education, income, color = sex)) +
   geom_point(alpha = 0.3) +
@@ -476,7 +488,7 @@ But we are not comparing the exact same thing!
 # First,get predictions in the data set
 
 data <- data %>%
-  mutate(predicted = predict(model),
+  mutate(predicted = predict(modelMulti),
          residual = income - predicted,
          abs_residual = abs(residual)
   )
