@@ -23,9 +23,13 @@ summary(Mydata)
 
 # Changing the type of Sex variable
 
-Mydata  <- Mydata %>%
-  mutate( sexF = as.factor(sex), 
-          education_level  = as.factor(education_level)
+MydataNew  <- Mydata %>%
+  mutate( sexF = as.factor(sexF), 
+          education_level  = as.factor(education_level), 
+          age_group = case_when(
+            age <20 ~ "young",
+            age >= 20 & age <40 ~"middle", 
+            age >= 40 ~"senior")
           )
 
 # Descriptive analysis
@@ -83,6 +87,34 @@ Mydata %>%
   facet_wrap(vars(agecat))+
   theme_minimal()
 
+# Regression
+
+modeluni <- lm(data = Mydata,
+               income~education)
+# Results 
+summary(modeluni)
+
+# Nice formating of results
+modelsummary(modeluni,
+             stars =TRUE)
+
+# Another model
+modelmulti <-lm(data = Mydata,
+                income~education + sexF + education_level) 
+
+summary(modelmulti)
+
+modelmultiwithage <-lm(data = Mydata,
+                income~education + sexF + education_level + age) 
 
 
+modelmultiSex <-lm(data = Mydata,
+                       income~education + sexF +  age) 
 
+
+modelmultiwithageNew <-lm(data = MydataNew,
+                       income~education + sexF + education_level + age_group) 
+
+#compare models
+modelsummary(list(modeluni, modelmulti, modelmultiwithage, modelmultiwithageNew), 
+             stars =TRUE)
