@@ -7,6 +7,8 @@ setwd("C:/GitMain/DataScience4OS/code")
 # load some packages 
 library(haven)   # if we need to load Excel , Stat, files...
 library(tidyverse)  # Data Science package
+library(modelsummary)
+library(esquisse)
 
 # Step1: Load the data
 Mydata <- read.csv("../Data/Household.csv")
@@ -26,6 +28,60 @@ Mydata  <- Mydata %>%
           education_level  = as.factor(education_level)
           )
 
+# Descriptive analysis
+datasummary_skim(Mydata,
+                 type = "numeric",
+                 title = "Numerical variables descriptive statistics"
+                 )
+
+datasummary_skim(Mydata,
+                 type = "categorical")
+
+
+# Selecting only variables of interest
+
+Mydata <- Mydata %>%
+  select(income, age, education, education_level, sexF)
+
+# Graphics with the help of esquisse package
+# Basic plot
+
+Mydata %>%
+  ggplot()+
+    aes(x = education, y = income)+
+    geom_point(colour = "#112446") +
+    facet_wrap(vars(agecat))+
+    theme_minimal()
+
+#plot by facet
+
+ggplot(Mydata) +
+  aes(x = education, y = income) +
+  geom_point(colour = "#112446") +
+  labs(title = " Income vs Education", 
+       caption = "Data from 2026") +
+  theme_minimal() +
+  facet_wrap(vars(sexF))
+
+#plot by facet
+
+GraphIncomeBySex <- ggplot(Mydata) +
+  aes(x = education, y = income, colour = sexF) +
+  geom_point() +
+  scale_color_hue(direction = 1) +
+  theme_minimal() +
+  facet_wrap(vars(sexF))
+
+GraphIncomeBySex
+
+# Prefered way of coding with example
+Mydata %>%
+  mutate(agecat = as.factor(ifelse(age> 40, "senior", "young")))%>%
+  ggplot()+
+  aes(x = education, y = income)+
+  geom_point(colour = "#112446") +
+  facet_wrap(vars(agecat))+
+  theme_minimal()
 
 
 
