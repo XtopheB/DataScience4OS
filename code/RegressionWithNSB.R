@@ -54,7 +54,6 @@ Mydata %>%
   ggplot()+
     aes(x = education, y = income)+
     geom_point(colour = "#112446") +
-    facet_wrap(vars(agecat))+
     theme_minimal()
 
 #plot by facet

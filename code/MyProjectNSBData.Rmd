@@ -1,0 +1,23 @@
+---
+title: "My Project with My data"
+author: "Christophe Bontemps"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r  Packages}
+# load some packages 
+library(haven)   # if we need to load Excel , Stat, files...
+library(tidyverse)  # Data Science package
+library(modelsummary)
+library(esquisse)
+
+```
+
+
