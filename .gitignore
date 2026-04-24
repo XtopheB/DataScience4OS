@@ -10,7 +10,6 @@
 .RData
 .RDataTmp
 *.Rproj
-
 #  Outputs
 *.zip
 # User-specific files
@@ -42,5 +41,10 @@ docs/
 po/*~
 # RStudio Connect folder
 rsconnect/
+
+# Files created during execuion
+
 tinytable_assets
 DataScience-FirstAnalysis_files
+JobSatisfaction_files
+PCPExercice_files
