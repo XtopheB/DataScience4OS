@@ -1,11 +1,9 @@
 ---
 title: "A step-by-step Analysis- Descriptive"
-subtitle: "NSB course - Paro"
+subtitle: "Data Science for Official Statistics - Daejeon"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
-  pdf_document: default
-  word_document: default
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -14,6 +12,8 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
+  word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -104,28 +104,7 @@ They are essential, but:
 
 We illustrate this here in this reproducible example. 
 
----
-
-## A simple question
-
-**Question:**  
-> How does household income vary with education?
-
----
-
-
 # Data
-
-**Variables:**
-
-- **income**:  Household income (continuous)
-- **education**: Adjusted years of education of household head (continuous)
-- **age**: Age of household head (continuous)
-- **sex**: Sex of household head ("Man" or "Woman)
-- **education_level**: Level of education (3 levels)
-- **age_group**: Age classification ("Young" , "Middle", "Old")
-
-
 
 ```{r DGP, echo=FALSE}
 # Data-generating process (unknown to the analyst)
@@ -164,14 +143,24 @@ data <- tibble(
 ```
 
 
-```{r}
+```{r , include=FALSE}
 write_csv(data, "Data/Household.csv")
 ```
 
 
-```{r dataloading, include=FALSE}
-read.csv("Data/Household.csv")
+```{r dataloading}
+data <-read.csv("Data/Household.csv")
 ```
+
+**Variables:**
+
+- **income**:  Household income (continuous)
+- **education**: Adjusted years of education of household head (continuous)
+- **age**: Age of household head (continuous)
+- **sex**: Sex of household head ("Man" or "Woman)
+- **education_level**: Level of education (3 levels)
+- **age_group**: Age classification ("Young" , "Middle", "Old")
+
 
 
 ```{r cleaning, echo=FALSE}
@@ -188,16 +177,25 @@ data <- data %>%
   )
 ```
 
-# Data Analysis
+# Data 
 
-
-> First one can have a look at the dat set (raw data). Here only 6 first observations. 
+> First one can have a look at the data set (raw data). Here we dislay the 6 first observations. 
 
 ```{r}
 head(data)
 ```
+ 
+ > **Question**:   How many variables in the data set? 
 
-> **Question**:   How many variables in the data set? 
+---
+
+# Analysis
+
+
+**Question:**  
+> What determines the level of `income` for households?
+
+---
 
 
 ###  Descriptive statistics
@@ -288,7 +286,8 @@ ggplot(data, aes(age, income)) +
     color = "Age"
   )
 ```
-The relationship is still hard to interpret clearly.
+
+> The relationship is still hard to interpret clearly.
 
 ### Income and Education , by age groups
 
