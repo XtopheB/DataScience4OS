@@ -1,24 +1,24 @@
 ---
 title: "Report for Trade Statistics"
-subtitle: "NSB course - Paro"
+subtitle: "Data Science Training"
 author: "Christophe Bontemps"
 date: "`r format(Sys.time(), '%A, %d %B %Y, %H:%M')`"
 output:
   html_document:
     toc: yes
-    code_folding: show
+    code_folding: hide
     toc_float: true
     df_print: paged
-  word_document:
-    toc: yes
   pdf_document:
+    toc: yes
+  word_document:
     toc: yes
 ---
 
 ```{r}
 # Select one product for time analysis
-# Other options: "Kava", "Coffee", "Alcoholic Drinks"
-Mygood <- "Kava"  
+# Other options: "Wood", "Coffee", "Alcoholic Drinks"
+Mygood <- "Wood"  
 
 ```
 
@@ -49,7 +49,7 @@ This is my *first* report using **Rmarkdown**. I will use a different data set:
 # We can use the data locally or from SIAP server
 
 # Mydata <- read.csv("Data/TradeData.csv")
-TradeData <- read.csv("https://www.unsiap.or.jp/on_line/2024/RAP/Data/TradeData.csv")
+Mydata <- read.csv("https://www.unsiap.or.jp/on_line/2024/RAP/Data/TradeData.csv")
 
 ```
 
@@ -158,7 +158,7 @@ Mydata %>%
 library(ggalluvial)
 
 p<- Mydata %>%
-  filter(Principle_Exports == "Wood") %>%
+  filter(Principle_Exports == Mygood) %>%
   filter(EXPORT_COUNTRY != IMPORT_COUNTRY) %>%        # remove same country flows
   group_by(EXPORT_COUNTRY, IMPORT_COUNTRY) %>%
   summarise(total = sum(Stat_Value, na.rm = TRUE), .groups = "drop") %>%
@@ -174,7 +174,7 @@ p<- Mydata %>%
   scale_x_discrete(limits = c("Export Country", "Import Country"),
                    expand = c(0.1, 0.1)) +
   labs(
-    title = "Trade Flow: Wood Exports",
+    title = paste("Trade Flow:",Mygood," Exports"),
     y = "Total Export Value",
     fill = "Export Country"
   ) +
@@ -205,7 +205,7 @@ library(tidyverse)
 
 # Prepare data
 flows <- Mydata %>%
-  filter(Principle_Exports == "Wood") %>%
+  filter(Principle_Exports == Mygood) %>%
   filter(EXPORT_COUNTRY != IMPORT_COUNTRY) %>%        # remove same country flows
   group_by(EXPORT_COUNTRY, IMPORT_COUNTRY) %>%
   summarise(total = sum(Stat_Value, na.rm = TRUE), .groups = "drop") %>%
