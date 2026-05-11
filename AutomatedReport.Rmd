@@ -7,7 +7,7 @@ output:
   word_document:
     toc: yes
   pdf_document:
-    toc: yes
+    toc: no
   html_document:
     toc: yes
     code_folding: hide
