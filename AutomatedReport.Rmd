@@ -4,21 +4,21 @@ subtitle: "Data Science Training"
 author: "Christophe Bontemps"
 date: "`r format(Sys.time(), '%A, %d %B %Y, %H:%M')`"
 output:
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
   html_document:
     toc: yes
     code_folding: hide
     toc_float: true
     df_print: paged
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
 ---
 
 ```{r}
-# Select one product for time analysis
+# Select one product for the detailed analysis
 # Other options: "Wood", "Coffee", "Alcoholic Drinks"
-Mygood <- "Wood"  
+Mygood <- "Coffee"  
 
 ```
 
