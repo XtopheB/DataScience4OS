@@ -1,6 +1,6 @@
 ---
 title: "Report for Trade Statistics"
-subtitle: "Data Science Training"
+subtitle: "Data Science Training" 
 author: "Christophe Bontemps"
 date: "`r format(Sys.time(), '%A, %d %B %Y, %H:%M')`"
 output:

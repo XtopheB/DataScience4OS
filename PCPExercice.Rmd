@@ -1,5 +1,5 @@
 ---
-title: "Exercise with Parallel Coordiante Plots"
+title: "Exercise with Parallel Coordinate Plots (PCP)"
 author: "Christophe Bontemps (SIAP)"
 subtitle: '*An example*'
 date: "`r Sys.Date()`"

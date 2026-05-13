@@ -18,6 +18,11 @@ We provide here some basic elements about the data set and descriptive statistic
 * First we load the data
 * second we print a summary
 
+
+```{r}
+library(tidyverse)
+```
+
 ```{r}
 TradeData <- read.csv("https://www.unsiap.or.jp/on_line/2024/RAP/Data/TradeData.csv")
 ```
@@ -34,12 +39,12 @@ summary(TradeData$Stat_Value)
 
 ```{r NbGoods}
 #  This is the number of different goods 
-TradeGoods <- length(unique(TradeData$Principle_Export))
+TradeGoods <- sqrt(length(unique(TradeData$Principle_Export)))
 
 ```
 
 
-The data set contains   **`r  nrow(TradeData)`  observations**, and  ***`r TradeGoods`*** variables.
+The data set contains   **`r  nrow(TradeData) +1`  observations**, and  `r TradeGoods ` variables.
 
 Here is a list of all variables available in the data set: 
 
@@ -53,6 +58,25 @@ The variable *Principle_Export* list all the types of goods exported from Esdeeg
 ```{r}
 unique(TradeData$Principle_Export)
 
+```
+
+
+
+```{r}
+p<- ggplot(TradeData) +
+  aes(x = Stat_Value, fill = Principle_Imports) +
+  geom_histogram(bins = 30L) +
+  scale_fill_hue(direction = 2) +
+  theme_minimal() +
+coord_flip() +
+  facet_wrap(vars(IMPORT_REGION))
+
+p
+
+```
+```{r}
+library(plotly)
+ggplotly(p)
 ```
 
 ```{r}

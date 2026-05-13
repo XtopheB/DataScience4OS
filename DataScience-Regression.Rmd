@@ -1,11 +1,9 @@
 ---
-title: "A step-by-step Analysis- Regression"
-subtitle: "NSB course - Paro"
+title: "Data Science- Regression"
+subtitle: "Step-by-step Analysis"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
-  pdf_document: default
-  word_document: default
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -14,6 +12,8 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
+  word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,11 +23,8 @@ knitr::opts_chunk$set(echo = TRUE)
 SIAP.color <- "#0385a8"
 ```
 
-> R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents (see <http://rmarkdown.rstudio.com>).
-
-> We'll use these documents for our Data Science Analysis
+> We'll use R Markdown documents for Data Science Analysis
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this one for loading data. 
 
