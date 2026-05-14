@@ -16,7 +16,6 @@ output:
   pdf_document: default
 ---
 
-
 ```{r setup, include=FALSE}
 # My default setting for this document
 knitr::opts_chunk$set(
@@ -106,6 +105,47 @@ They are essential, but:
 We illustrate this here in this reproducible example. 
 
 # Data
+
+```{r DGP, echo=FALSE}
+# Data-generating process (unknown to the analyst)
+
+n <- 600
+data <- tibble(
+  sex = sample(c("Men", "Women"), n, replace = TRUE),
+  age = round(rnorm(n, mean = 40, sd = 10)),
+  #education = round(rnorm(n, mean = 10, sd = 4))
+  education = rnorm(n, mean = 10, sd = 4)
+) %>%
+  mutate(
+    # Constrain education to realistic range (0-20 years)
+    education = pmax(0, pmin(20, education)),
+    
+    # Create education levels based on continuous education
+    education_level = case_when(
+      education < 8 ~ "Primary",
+      education < 14 ~ "Secondary",
+      education >= 14 ~ "Tertiary"
+    ),
+    
+    # Income calculation
+    base_income = 300,
+    education_effect = 20 * education,
+    sex_education_bonus = if_else(
+      sex == "Men" & education > 14,
+      300,
+      100
+    ),
+    income = base_income +
+      education_effect +
+      sex_education_bonus +
+      rnorm(n(), 0, 60)
+  )
+```
+
+
+```{r , include=FALSE}
+write_csv(data, "Data/Household.csv")
+```
 
 
 ```{r dataloading}
