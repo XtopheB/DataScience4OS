@@ -4,12 +4,6 @@ subtitle: "Data Science for Official Statistics"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
-  pdf_document:
-    toc: yes
-    df_print: kable
-  word_document:
-    toc: no 
-    number_sections: true
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -18,6 +12,13 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
+  word_document:
+    
+    toc: no 
+    number_sections: true
+  pdf_document:
+    toc: yes
+    df_print: kable
 always_allow_html: true  # <-- bypass errors caused by interactive HTML
 ---
 
@@ -167,7 +168,7 @@ data <- data %>%
 
 > First one can have a look at the data set (raw data). Here we dislay the 6 first observations. 
 
-```{r}
+```{r head}
 head(data)
 ```
  
@@ -179,29 +180,29 @@ head(data)
 
 
 **Question:**  
+
 > What determines the `income` for households?
 
 ---
-
 
 ##  Descriptive statistics
 
 We have both continuous and categorical variables:
 
-```{r}
+```{r StatSummary}
 datasummary_skim(data, 
                  type = "numeric", 
                  title = "Continuous variables")
 ```
 
 
-```{r}
+```{r StatSummaryC}
 datasummary_skim(data,
                  type = "categorical",
                  title = " Categorical (factors)")
 ```
 
-```{r}
+```{r StatGroup}
 data_by_sex <-data %>%
   group_by(sex) %>%
   summarise(
@@ -216,11 +217,9 @@ data_by_sex <-data %>%
   )
 ```
 
-
-
 ## Average income by sex
 
-```{r}
+```{r StatBySex}
 data_by_sex %>%
   ggplot(aes(sex, mean_income, fill = sex)) +
   geom_col(width = 0.2) +
@@ -236,7 +235,6 @@ data_by_sex %>%
 
 **Tempting interpretation:**  
 > Men earn more than women.
-
 
 ## Scatter plot: income vs education
 
@@ -256,11 +254,11 @@ This suggests a positive relationship, but variability is large.
 
 ##  Adding more information: Mutlivariate analysis
 
-## Income, education and age
+Looking at 2x2 relationships
 
 ## Income, and age
 
-```{r}
+```{r ScatterIncomeAge}
 ggplot(data, aes(age, income)) +
   geom_point(alpha = 0.6, color = "darkgrey") +
   geom_smooth(method = "lm", se = FALSE) +
@@ -277,7 +275,7 @@ ggplot(data, aes(age, income)) +
 ### Income and Education , by age groups
 
 
-```{r warning=FALSE}
+```{r ScatterIncomeEdu, warning=FALSE}
 ggplot(data, aes(education, income, color = age_group)) +
   geom_point(alpha = 0.6, position = position_jitter(width = 0.3, height = 0)) +
   facet_wrap(~ age_group) +
@@ -301,7 +299,7 @@ ggplot(data, aes(education, income, color = age_group)) +
 
 ## Can we plot all interactions? 
 
-```{r}
+```{r Scattermatrix}
 # Scatterplot matrix
 GGally::ggpairs(data, 
         columns = c("income", "age", "education"),
@@ -329,17 +327,22 @@ This motivates multivariate regression.
 
 # Regression model
 
-## Asimple  Linear model
+## A simple  Linear model
 
 Let's just assess the relation between $y$= income and  $X$ = Education
 
-```{r, echo=TRUE}
+```{r RegressionUni, echo=TRUE}
 modelUni <- lm(income ~ education, data = data)
 summary(modelUni)
 ```
 
-
 ```{r}
+tbl_regression(modelUni)
+
+```
+
+
+```{r }
 modelsummary(
   modelUni,
   statistic = "std.error",
@@ -348,6 +351,15 @@ modelsummary(
 )
 ```
 
+## Interpretation
+
+- The intercept is estimated at **`r round(coef(modelUni)[1], 2)`**.
+- A one-unit increase in education is associated with an average increase of **`r round(coef(modelUni)[2], 2)`** units of income.
+
+## Model fit
+
+- R-squared: **`r round(summary(modelUni)$r.squared, 3)`**
+- Adjusted R-squared: **`r round(summary(modelUni)$adj.r.squared, 3)`**
 
 ## Linear model with all variables
 
