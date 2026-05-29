@@ -1,21 +1,40 @@
 ---
 title: "A step-by-step Analysis- Descriptive"
-subtitle: "Data Science for Official Statistics - Daejeon"
+subtitle: "Data Science for Official Statistics"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: yes
+    df_print: kable
+  word_document:
+    toc: no 
+    number_sections: true
   html_document: 
     df_print: paged
     always_allow_html: true
-    toc: no
+    toc: yes
     toc_float: true
     keep_md: no
     code_folding: show
     code_download: true
-  word_document: default
-  pdf_document: default
+always_allow_html: true  # <-- bypass errors caused by interactive HTML
 ---
 
+
+# Motivation
+
+Descriptive statistics are essential in official statistics.  
+However, they are often insufficient to understand **relationships** between variables.
+
+They are essential, but:
+  - They hide heterogeneity
+  - They cannot isolate multiple effects
+  - They may lead to misleading policy conclusions
+
+We illustrate this here in this reproducible example. 
+
+## Settings and libraries
 
 ```{r setup, include=FALSE}
 # My default setting for this document
@@ -27,8 +46,25 @@ knitr::opts_chunk$set(
 )
 ```
 
+#### Install packages (*only once!*).
 
-```{r libraries, include=FALSE}
+```{r InstallPackages, include=FALSE}
+# List of the packages needed
+Mypackages <- c(
+  "tidyverse", "data.table",  "RColorBrewer",
+  "GGally", "knitr", "papeR", "modelsummary", 
+  "sjPlot", "gt", "gtsummary"   )
+
+# Install any packages that are not yet installed ;-)
+Newpackages <- setdiff(Mypackages, rownames(installed.packages()))
+install.packages(Newpackages)
+
+```
+
+####  Loading the packages needed for the analysis 
+
+```{r LoadPackages, include=FALSE}
+# Load the packages we need
 # Tidy data management packages
 library(tidyverse)
 library(data.table)
@@ -50,16 +86,13 @@ library(gtsummary)
 ```
 
 
+One can also define some settings for the graphics and colors
+
 ```{r setup_graphics, include=FALSE}
 # Setting the theme for graphics
 theme_set(theme_minimal() + theme(panel.grid = element_blank()))
 ```
 
-
-```{r seed, include=FALSE}
-# We'll see why this is important later
-set.seed(2512) # For reproducibility
-```
 
 ```{r colors, echo = FALSE}
 
@@ -93,17 +126,11 @@ Some_colors <-c(
   
 ```
 
-## Motivation
 
-Descriptive statistics are essential in official statistics.  
-However, they are often insufficient to understand **relationships** between variables.
-
-They are essential, but:
-  - They hide heterogeneity
-  - They cannot isolate multiple effects
-  - They may lead to misleading policy conclusions
-
-We illustrate this here in this reproducible example. 
+```{r seed, include=FALSE}
+# We'll see why this is important later
+set.seed(2512) # For reproducibility
+```
 
 # Data
 
@@ -137,7 +164,6 @@ data <- data %>%
   )
 ```
 
-# Data 
 
 > First one can have a look at the data set (raw data). Here we dislay the 6 first observations. 
 
@@ -153,12 +179,12 @@ head(data)
 
 
 **Question:**  
-> What determines the level of `income` for households?
+> What determines the `income` for households?
 
 ---
 
 
-###  Descriptive statistics
+##  Descriptive statistics
 
 We have both continuous and categorical variables:
 
@@ -211,7 +237,6 @@ data_by_sex %>%
 **Tempting interpretation:**  
 > Men earn more than women.
 
-# Adding a continuous variable
 
 ## Scatter plot: income vs education
 
@@ -229,7 +254,7 @@ ggplot() +
 
 This suggests a positive relationship, but variability is large.
 
-# Adding more information
+##  Adding more information: Mutlivariate analysis
 
 ## Income, education and age
 
@@ -292,15 +317,15 @@ GGally::ggpairs(data,
 
 
 
-# Limitation of descriptive statistics
+# Limitations of descriptive statistics
 
-## Why this is still not enough
+## Why this is still not enough?
 
 - Visual inspection is difficult sometimes
 - Effects are hard to quantify
 - Multiple variables are difficult to handle simultaneously, the number of interactions is important. 
 
-This motivates regression.
+This motivates multivariate regression.
 
 # Regression model
 
@@ -411,12 +436,11 @@ ggplot(data, aes(education, income, color = sex)) +
 **Descriptive statistics describe.  
 Regression explains.**
 
-## Carreful of partial analysis
+## Be carreful of partial analysis
 
 
 ## Income–education relationship by sex
 If we do the analysis by sex (that is for women only vs for Men only), we have this: 
-
 
 ```{r}
 ggplot(data, aes(education, income, color = sex)) +
