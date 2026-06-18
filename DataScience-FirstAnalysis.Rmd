@@ -1,5 +1,5 @@
 ---
-title: "A step-by-step Analysis- Descriptive"
+title: "A step-by-step Data Analysis"
 subtitle: "Data Science for Official Statistics"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
@@ -68,6 +68,7 @@ install.packages(Newpackages)
 
 ```{r LoadPackages, include=FALSE}
 # Load the packages we need
+# tip: load tidyverse last to avoid issues with summarize!
 
 cat("Installing all packages" )
 for (pkg in Mypackages) {
