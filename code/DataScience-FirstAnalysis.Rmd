@@ -4,6 +4,11 @@ subtitle: "Data Science for Official Statistics"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
+  
+  word_document:
+    #reference_docx: KAZ-Template.docx
+    toc: no 
+    number_sections: true
   html_document: 
     df_print: paged
     always_allow_html: true
@@ -12,14 +17,9 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
-  word_document:
-    #reference_docx: KAZ-Template.docx
-    toc: no 
-    number_sections: true
   pdf_document:
     toc: yes
     df_print: kable
-  
 always_allow_html: true  # <-- bypass errors caused by interactive HTML
 ---
 
@@ -89,12 +89,14 @@ for (pkg in Mypackages) {
 - GGally
 
 **Tables and sumary statistics** 
+
 - modelsummary
 - sjPlot
 - gt 
 - gtsummary
 
 **Nice presentation of results**
+
 - knitr
 - papeR
 
@@ -147,7 +149,6 @@ set.seed(2512) # For reproducibility
 
 # Data
 
-
 ```{r dataloading}
 data <-read.csv("../Data/Household.csv")
 ```
@@ -164,7 +165,7 @@ data <-read.csv("../Data/Household.csv")
 
 
 ```{r cleaning, echo=FALSE}
-# Data Simulation cleaning
+# Data  cleaning
 data <- data %>%
   select(income, age,  education, sex, education_level) %>%
   mutate(age_group = case_when( age <20 ~ "Young",
@@ -220,13 +221,14 @@ data_by_sex <-data %>%
   summarise(
     N = n(),
     mean_income = round(mean(income), 1),
-    sd_income = round(sd(income), 1),
-    min_income = round(min(income), 1),
-    max_income = round(max(income), 1),
-    mean_years_education = round(mean(education), 1),
+    min_inc = round(min(income), 1),
+    max_inc = round(max(income), 1),
+    mean_educ = round(mean(education), 1),
     mean_age = round(mean(age), 1),
     .groups = "drop"
   )
+
+kable(data_by_sex)
 ```
 
 ## Average income by sex
@@ -243,6 +245,8 @@ data_by_sex %>%
   ) +
   coord_flip()+
   theme(legend.position = "none")
+
+
 ```
 
 **Tempting interpretation:**  
