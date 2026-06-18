@@ -12,15 +12,13 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
-  
   word_document:
-    #reference_docx: KAZ-Template.docx
+    
     toc: no 
     number_sections: true
   pdf_document:
     toc: yes
     df_print: kable
-  
 always_allow_html: true  # <-- bypass errors caused by interactive HTML
 ---
 
@@ -457,12 +455,10 @@ ggplot(data, aes(education, income, color = sex)) +
 - But they are not sufficient for policy analysis
 - Regression is a natural and necessary extension
 
-> **Descriptive statistics describe.  
+**Descriptive statistics describe.  
 Regression explains.**
 
----
-
-# Bonus: A note on *partial* analysis
+## Be carreful of partial analysis
 
 
 ## Income–education relationship by sex
@@ -486,9 +482,81 @@ We now see:
 - Education increases income for both sexes
 - The effect is **stronger for young women** !!
 
-> But we are not comparing the exact same thing!
+But we are not comparing the exact same thing! 
+- We are not analysing the whole population, we are just doing 2 different analysis, one for each sex, and therefore not comparing men and women fairly.   
 
-We are not analysing the **whole population**, we are just doing **2 different analysis**, one for each sex, and therefore not comparing men and women fairly!   
+
+
+##  Regression explained
+
+```{r regression-explained}
+# First,get predictions in the data set
+
+data <- data %>%
+  mutate(predicted = predict(modelMulti),
+         residual = income - predicted,
+         abs_residual = abs(residual)
+  )
+                             
+# Select 8 random points to show residuals
+
+# Divide education into bins and pick one extreme point from each bin
+sample_points <- data %>%
+  mutate(edu_bin = cut(education, breaks = 9)) %>%  # Create 8 bins
+  group_by(edu_bin) %>%
+    sample_n(1) %>% # One residual in each bin
+  ungroup() %>%
+  select(-edu_bin)
+
+```
+
+
+```{r regression-RedPoints}
+# Create the plot
+ggplot(data, aes(education, income)) +
+  geom_point(alpha = 0.4, color = "grey") +
+  geom_smooth(method = "lm", se = FALSE, color = "grey") +
+  
+  # Highlight the sampled points
+  geom_point(data = sample_points,
+             aes(education, income),
+             color = "red", 
+             size = 2,
+             alpha = 0.8) +
+  labs(
+    title = "Income and education",
+    subtitle = "Highlighting points (in red) far from the regression line)",
+    x = "Education (Adjusted years)",
+    y = "Income"
+  )
+```
+
+
+```{r regression-RedVlines}
+# Create the plot
+ggplot(data, aes(education, income)) +
+  geom_point(alpha = 0.4, color = "grey") +
+  geom_smooth(method = "lm", se = FALSE, color = "grey") +
+  # Add red vertical lines for residuals
+  geom_segment(data = sample_points,
+               aes(x = education, xend = education,
+                   y = income, yend = predicted),
+               color = "red", 
+               linewidth = 1,
+               linetype = "solid") +
+  # Highlight the sampled points
+  geom_point(data = sample_points,
+             aes(education, income),
+             color = "red", 
+             size = 1.5,
+             alpha = 0.8) +
+  labs(
+    title = "Income and education",
+    subtitle = "Red lines show residuals (observed - predicted)",
+    x = "Education (Adjusted years)",
+    y = "Income"
+  )
+```
 
 
 
