@@ -4,12 +4,7 @@ subtitle: "Data Science for Official Statistics"
 author: "Christophe Bontemps"
 date:   "`r Sys.Date()`"
 output:
-  
-  word_document:
-    #reference_docx: KAZ-Template.docx
-    toc: no 
-    number_sections: true
-  html_document: 
+   html_document: 
     df_print: paged
     always_allow_html: true
     toc: yes
@@ -17,9 +12,14 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
+  word_document:
+    #reference_docx: KAZ-Template.docx
+    toc: no 
+    number_sections: true
   pdf_document:
     toc: yes
     df_print: kable
+ 
 always_allow_html: true  # <-- bypass errors caused by interactive HTML
 ---
 
@@ -215,6 +215,8 @@ datasummary_skim(data,
                  title = " Categorical (factors)")
 ```
 
+### Stats by sex
+
 ```{r StatGroup}
 data_by_sex <-data %>%
   group_by(sex) %>%
@@ -231,7 +233,7 @@ data_by_sex <-data %>%
 kable(data_by_sex)
 ```
 
-## Average income by sex
+### Average income by sex
 
 ```{r StatBySex}
 data_by_sex %>%
@@ -240,6 +242,7 @@ data_by_sex %>%
   scale_fill_manual(values = sex_colors) +
   labs(
     title = "Average income by sex",
+    subtitle = "NB: This is not a good graphic!",
     y = "Mean income",
     x = NULL
   ) +
@@ -251,6 +254,26 @@ data_by_sex %>%
 
 **Tempting interpretation:**  
 > Men earn more than women.
+
+
+### A better representation of that 
+```{r}
+ggplot(data, aes(x = sex, y = income, fill = sex)) +
+  # geom_boxplot(width = 0.3) +
+  geom_jitter(width = 0.2, alpha = 0.5, color = "grey70" ) +
+  scale_fill_manual(values = sex_colors) +
+  labs(
+    title = "Income by Sex",
+    subtitle = "Showing the variability",
+    x = NULL,
+    y = "Income"
+  ) +
+  coord_flip() +
+  theme_classic() +
+  theme(legend.position = "none")
+```
+
+
 
 ## Scatter plot: income vs education
 
