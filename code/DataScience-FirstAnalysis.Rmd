@@ -12,7 +12,6 @@ output:
     keep_md: no
     code_folding: show
     code_download: true
-  
   word_document:
     #reference_docx: KAZ-Template.docx
     toc: no 
@@ -150,7 +149,7 @@ set.seed(2512) # For reproducibility
 
 
 ```{r dataloading}
-data <-read.csv("Data/Household.csv")
+data <-read.csv("../Data/Household.csv")
 ```
 
 **Variables:**
