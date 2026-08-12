@@ -1,6 +1,5 @@
 ---
 title: "Exercise with Parallel Coordinate Plots (PCP)"
-author: "Christophe Bontemps (SIAP)"
 subtitle: '*An example*'
 date: "`r Sys.Date()`"
 output:
@@ -75,6 +74,10 @@ data <- tibble(
   )
 )
 
+# Saving for students
+write.csv(select(data, c(age, education, income)),
+                 "Data/PCPData.csv", row.names = FALSE)
+
 ```
 
 
@@ -138,11 +141,100 @@ ggparcoord(
   )
 ```
 
+# Interactive version
+
+
+```{r interactive-pcpsex, fig.height=7}
+# Prepare data for plotly
+plot_data <- data %>%
+  mutate(
+    color_code = ifelse(sex == "Men", 0, 1),
+    label = paste0(
+      "ID: ", id, "<br>",
+      "Sex: ", sex, "<br>",
+      "Age: ", age, "<br>",
+      "Education: ", education, " years<br>",
+      "Income: $", format(income, big.mark = ",")
+    )
+  )
+
+n <- nrow(plot_data)
+
+# Create interactive parallel coordinates plot
+fig <- plot_ly(
+  data = plot_data,
+  type = 'parcoords',
+  line = list(
+    color = rep(0, n),
+    colorscale = list(c(0, '#999999'), c(1, '#999999')),
+    showscale = FALSE,
+    width = 4
+  ),
+  dimensions = list(
+    list(label = 'Age', values = ~age, range = c(20, 60)),
+    list(label = 'Education (years)', values = ~education, range = c(10, 20)),
+    list(label = 'Income ($)', values = ~income, range = c(30000, 90000))
+  )
+)
+
+fig <- fig %>%
+  layout(
+    title = list(
+      text = "Interactive Parallel Coordinate Plot",
+      font = list(size = 16),
+      y = 0.98
+    ),
+    annotations = list(
+      list(
+        text = "Drag axes to filter",
+        showarrow = FALSE,
+        xref = "paper", yref = "paper",
+        x = 1, y = 1.2,
+        font = list(size = 9, color = "grey40")
+      )
+    ),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        direction = "right",
+        x = 0.5, xanchor = "center",
+        y = 1.22, yanchor = "top",
+        buttons = list(
+          list(
+            method = "restyle",
+            args = list(list(
+              "line.color" = list(rep(0, n)),
+              "line.colorscale" = list(list(c(0, '#999999'), c(1, '#999999')))
+            )),
+            label = "No Color"
+          ),
+          list(
+            method = "restyle",
+            args = list(list(
+              "line.color" = list(plot_data$color_code),
+              "line.colorscale" = list(list(c(0, '#3498DB'), c(1, '#E74C3C')))
+            )),
+            label = "Color"
+          )
+        )
+      )
+    ),
+    margin = list(l = 100, r = 100, t = 180, b = 50),
+    plot_bgcolor = '#f8f9fa',
+    paper_bgcolor = 'white'
+  )
+
+fig
+```
+
+
+
+
 # PCP with Hidden Grouping
 
-Now let's color the lines by sex (a variable that was hidden before), making the two groups visually distinct.
+We can color the lines by sex (a variable that was hidden before), making the two groups visually distinct.
 
-```{r pcp-colored}
+```{r pcp-colored,, eval=FALSE, include=FALSE}
 # Add sex back for coloring
 data_with_sex <- data %>%
   select(id, sex, age, education, income)
